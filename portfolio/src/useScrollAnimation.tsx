@@ -1,5 +1,5 @@
 import React from "react";
-import "./UseScrollAnimation.css";
+import "./useScrollAnimation.css";
 
 export default function UseScrollAnimation() {
   const colors = [
