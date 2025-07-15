@@ -1,0 +1,140 @@
+:root {
+  --lg-bg-color: rgba(255, 255, 255, 0.1);
+  --lg-highlight: rgba(255, 255, 255, 0.5);
+  --lg-text: #ffffff;
+  --lg-red: #fb4268;
+  --lg-grey: #5b5b5b;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.container--inline {
+  flex-direction: row;
+}
+
+.glass-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  color: var(--lg-text);
+  background: transparent;
+  border-radius: 2rem;
+  overflow: hidden;
+  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s ease;
+  width: 100%;
+  max-width: 500px;
+}
+
+.glass-container--large {
+  min-width: 320px;
+}
+
+.glass-filter {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  backdrop-filter: blur(3px);
+}
+
+.glass-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--lg-bg-color);
+}
+
+.glass-specular {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  box-shadow: inset 1px 1px 0 var(--lg-highlight), inset 0 0 5px var(--lg-highlight);
+  border-radius: inherit;
+}
+
+.glass-content {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 1rem;
+  width: 100%;
+}
+
+.player__thumb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.player__img {
+  width: 120px;
+  border-radius: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.player__legend__title {
+  font-size: 1.2rem;
+  margin: 0;
+  color: #fff;
+  text-shadow: 0 0 3px #000;
+}
+
+.player__legend__sub-title {
+  font-size: 0.9rem;
+  margin: 0;
+  color: #ccc;
+  text-shadow: 0 0 2px #000;
+}
+
+/* כפתור זכוכית במקום play-button */
+.glass-play-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
+  color: #ffffff;
+  font-size: 1.05rem;
+  padding: 0.6rem 1.5rem;
+  border-radius: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.6);
+  width: fit-content;
+}
+
+.glass-play-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.glass-play-button:active {
+  transform: scale(0.95);
+}
+
+.audio-range {
+  width: 100%;
+  cursor: pointer;
+  accent-color: #ffffff;
+  margin: 0.5rem 0;
+  height: 6px;
+  border-radius: 5px;
+  background: linear-gradient(to right, #fff 0%, #888 100%);
+}
+
+.time-display {
+  display: flex;
+  justify-content: space-between;
+  width: 90%;
+  font-size: 0.9rem;
+  color: #ccc;
+}

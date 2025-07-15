@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "baseUrl": "./",
+    "paths": {},
+    "types": ["animejs"],
+        "typeRoots": ["./node_modules/@types", "./src/types"]
+  },
+  "include": ["src"]
+}

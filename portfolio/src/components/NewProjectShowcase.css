@@ -1,0 +1,129 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Elsie+Swash+Caps&display=swap");
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #0b0a0a;
+  font-family: "Outfit", sans-serif;
+  color: #f1d7ff;
+  overflow-x: hidden;
+}
+
+.project-showcase {
+  width: 100%;
+  min-height: 100vh;
+  background: #0b0a0a;
+  overflow-x: hidden;
+  font-family: "Outfit", sans-serif;
+  color: #f1d7ff;
+}
+
+#projects-container {
+  position: relative;
+}
+
+/* INTRO */
+.intro-section {
+  padding: 6rem 1rem 4rem;
+  text-align: center;
+}
+
+.intro-title {
+  font-size: 3.8rem;
+  color: #bd485b;
+  font-family: "Elsie Swash Caps", serif;
+  margin: 0;
+}
+
+.intro-sub {
+  font-size: 1.5rem;
+  color: #eaddeb;
+  opacity: 0.8;
+  margin-top: 1rem;
+}
+
+/* PROJECT SECTIONS */
+.project-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 1rem;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.project-text {
+  max-width: 800px;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding: 0 1rem;
+}
+
+.project-title {
+  font-size: 3rem;
+  font-family: "Elsie Swash Caps", serif;
+  color: #eb8192;
+  margin: 0 0 1rem;
+  mix-blend-mode: color-dodge;
+}
+
+.project-description {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  white-space: pre-line;
+  color: #eaddeb;
+  background-color: rgba(255, 255, 255, 0.03);
+  padding: 1.5rem 2rem;
+  border-radius: 14px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.06);
+  transition: all 0.4s ease;
+}
+
+/* IMAGE */
+.project-image-wrapper {
+  overflow: hidden;
+  max-width: 90vw;
+  max-height: 60vh;
+  border-radius: 18px;
+  box-shadow: 0 0 60px rgba(255, 255, 255, 0.1);
+}
+
+/* SVG */
+.svg-project-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.mask-circle {
+  transition: r 0.4s ease;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .intro-title {
+    font-size: 2.4rem;
+  }
+
+  .intro-sub {
+    font-size: 1.1rem;
+  }
+
+  .project-title {
+    font-size: 2rem;
+  }
+
+  .project-description {
+    font-size: 1rem;
+    padding: 1rem;
+  }
+
+  .project-image-wrapper {
+    max-height: 40vh;
+  }
+}

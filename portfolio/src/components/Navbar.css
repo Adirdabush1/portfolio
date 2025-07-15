@@ -1,0 +1,107 @@
+.wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: #000000;
+  clip-path: circle(25px at calc(100% - 45px) 45px);
+  transition: all 0.3s ease-in-out;
+  pointer-events: none;
+  user-select: none;
+}
+
+.wrapper.active {
+  clip-path: circle(75%);
+  pointer-events: auto;
+  user-select: auto;
+}
+
+.menu-btn {
+  position: absolute;
+  z-index: 9999;
+  right: 20px;
+  top: 20px;
+  height: 50px;
+  width: 50px;
+  text-align: center;
+  line-height: 50px;
+  border-radius: 50%;
+  font-size: 20px;
+  color: #000000;
+  cursor: pointer;
+  background: #fffafa;
+  transition: all 0.3s ease-in-out;
+  user-select: none;
+  z-index: 10000;
+}
+
+.menu-btn.open {
+  color: #000000;
+}
+
+.menu-btn.open i:before {
+  content: "\f00d";
+  /* x icon */
+}
+
+.wrapper ul {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  list-style: none;
+  text-align: center;
+  padding: 0;
+  margin: 0;
+}
+
+.wrapper ul li {
+  margin: 15px 0;
+}
+
+.wrapper ul li a {
+  color: #000000;
+  text-decoration: none;
+  font-size: 30px;
+  font-weight: 500;
+  padding: 5px 30px;
+  border-radius: 50px;
+  position: relative;
+  line-height: 50px;
+  background: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.wrapper ul li a:after {
+  position: absolute;
+  content: "";
+  background: linear-gradient(#14ffe9, #ffeb3b, #ff00e0);
+  width: 104%;
+  height: 110%;
+  left: -2%;
+  top: -5%;
+  border-radius: 50px;
+  transform: scaleY(0);
+  z-index: -1;
+  animation: rotate 1.5s linear infinite;
+  transition: transform 0.3s ease;
+}
+
+.wrapper ul li a:hover:after {
+  transform: scaleY(1);
+}
+
+.wrapper ul li a:hover {
+  color: #fff;
+}
+
+@keyframes rotate {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+
+  100% {
+    filter: hue-rotate(360deg);
+  }
+}

@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Teko:wght@600&family=Space+Mono&display=swap');
+
+:root {
+  --spotlight-gradient: linear-gradient(90deg,
+      #ffffff,
+      #c0c0c0,
+      #7f8c8d,
+      #aab0b2,
+      #e0e0e0,
+      #ffffff);
+}
+
+body {
+  background: #000;
+  margin: 0;
+  padding: 0;
+}
+
+.about-section {
+  background: #000;
+  color: #fff;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.spotlight-heading {
+  font-family: 'Teko', sans-serif;
+  text-transform: uppercase;
+  font-size: 10rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 3rem;
+  position: relative;
+  background: #171717;
+  color: #000;
+  line-height: 1;
+}
+
+.spotlight-heading::before {
+  content: attr(data-text);
+  position: absolute;
+  background: var(--spotlight-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-size: 100% 90%;
+  clip-path: ellipse(120px 120px at -2.54% -9.25%);
+  animation: swing 5s infinite alternate;
+  line-height: 1;
+}
+
+@keyframes swing {
+  0% {
+    clip-path: ellipse(120px 120px at -2.54% -9.25%);
+  }
+
+  50% {
+    clip-path: ellipse(120px 120px at 49.66% 64.36%);
+  }
+
+  100% {
+    clip-path: ellipse(120px 120px at 102.62% -1.61%);
+  }
+}
+
+.text-block {
+  margin: 0 auto;
+  max-width: 800px;
+  font-family: 'Space Mono', monospace;
+  font-weight: 400;
+  font-style: normal;
+  font-size: clamp(16px, 4vw, 40px);
+  color: #fff;
+  line-height: 1.6;
+  padding: 0 1rem;
+  will-change: transform;
+}
+
+.char {
+  will-change: transform;
+}

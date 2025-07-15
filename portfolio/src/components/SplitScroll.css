@@ -1,0 +1,55 @@
+/* מוודא שזה לא ידרוס דברים אחרים */
+.split-section-container {
+  width: 100%;
+  padding: 4rem 0;
+  background-color: #0f172a;
+  color: white;
+}
+
+.split-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.split-aside {
+  flex: 1 1 300px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2rem;
+  border-radius: 1rem;
+  line-height: 1.8;
+  font-size: 1.1rem;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.split-content {
+  flex: 2 1 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.split-project {
+  padding: 2rem;
+  border-radius: 1rem;
+  color: white;
+  transition: transform 0.3s ease;
+}
+
+.split-project:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.split-project h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.split-project p {
+  font-size: 1.1rem;
+}
