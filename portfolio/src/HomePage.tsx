@@ -5,13 +5,11 @@ import Navbar from "./components/Navbar";
 import GlassAudioPlayer from "./components/GlassAudioPlayer";
 import AboutMeSection from "./components/AboutMeSection";
 import AboutMe from "./components/AboutMe";
-import UseScrollAnimation from "./useScrollAnimation"; 
+import UseScrollAnimation from "./useScrollAnimation";
 import WantToSeeMore from "./components/WantToSeeMore";
 import NewProjectShowcase from "./components/NewProjectShowcase";
 import AiAssistant from "./components/AiaSSISTANT";
-import ContactSection from "./components/ContactSection"
-
-// import ThreeImageScroll from "./components/ThreeImageScroll";
+import ContactSection from "./components/ContactSection";
 import "./HomePage.css";
 
 export default function HomePage() {
@@ -24,7 +22,7 @@ export default function HomePage() {
 
   return (
     <div id="projects-container" style={{ overflowX: "hidden" }}>
-      <div className="homepage-container">
+      <div className="homepage-container" id="home">
         <Navbar />
         <UseScrollAnimation />
 
@@ -52,7 +50,6 @@ export default function HomePage() {
             </div>
 
             <WantToSeeMore />
-            
           </div>
 
           <img
@@ -63,15 +60,29 @@ export default function HomePage() {
         </div>
       </div>
 
-      <section id="more-section"></section>
+      <section id="about-me-section">
+        <AboutMeSection />
+      </section>
 
-      <AboutMeSection />
-      {/* <ThreeImageScroll /> */}
-      <GlassAudioPlayer />
-      <AboutMe />
-      <NewProjectShowcase />
-      <AiAssistant ></AiAssistant>
-      <ContactSection></ContactSection>
+      <section id="audio-player">
+        <GlassAudioPlayer />
+      </section>
+
+      <section id="about-details">
+        <AboutMe />
+      </section>
+
+      <section id="projects">
+        <NewProjectShowcase />
+      </section>
+
+      <section id="ai-assistant">
+        <AiAssistant />
+      </section>
+
+      <section id="contact">
+        <ContactSection />
+      </section>
     </div>
   );
 }

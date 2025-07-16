@@ -14,29 +14,40 @@ body {
   background: #000;
   margin: 0;
   padding: 0;
+  font-family: 'Space Mono', monospace;
+  color: #fff;
 }
 
+/* סקשן כללי */
 .about-section {
   background: #000;
   color: #fff;
-  padding: 4rem 2rem;
+  padding: clamp(2rem, 5vw, 4rem) 1rem;
+  /* ריווח גמיש */
   text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
+/* כותרת גדולה עם גודל רספונסיבי */
 .spotlight-heading {
   font-family: 'Teko', sans-serif;
   text-transform: uppercase;
-  font-size: 10rem;
+  font-size: clamp(4rem, 10vw, 10rem);
+  /* משתנה לפי רוחב המסך */
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0 auto 3rem;
+  margin: 0 auto 2rem;
   position: relative;
   background: #171717;
   color: #000;
   line-height: 1;
+  padding: 0 1rem;
+  user-select: none;
 }
 
+/* אפקט הטקסט עם גרדיאנט */
 .spotlight-heading::before {
   content: attr(data-text);
   position: absolute;
@@ -48,6 +59,10 @@ body {
   clip-path: ellipse(120px 120px at -2.54% -9.25%);
   animation: swing 5s infinite alternate;
   line-height: 1;
+  width: 100%;
+  left: 0;
+  top: 0;
+  pointer-events: none;
 }
 
 @keyframes swing {
@@ -64,19 +79,40 @@ body {
   }
 }
 
+/* בלוק הטקסט עם פונט משתנה */
 .text-block {
   margin: 0 auto;
   max-width: 800px;
-  font-family: 'Space Mono', monospace;
   font-weight: 400;
   font-style: normal;
-  font-size: clamp(16px, 4vw, 40px);
+  font-size: clamp(14px, 3vw, 24px);
   color: #fff;
   line-height: 1.6;
   padding: 0 1rem;
   will-change: transform;
+  user-select: text;
 }
 
+/* אנימציית התווים */
 .char {
   will-change: transform;
+}
+
+/* מדיה קווריז לטלפונים */
+@media (max-width: 600px) {
+  .spotlight-heading {
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .text-block {
+    max-width: 100%;
+    font-size: 16px;
+    padding: 0 0.5rem;
+  }
+
+  .about-section {
+    padding: 2rem 1rem;
+  }
 }
