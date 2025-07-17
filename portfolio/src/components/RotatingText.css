@@ -3,7 +3,7 @@
   flex-wrap: wrap;
   justify-content: center;
   text-transform: uppercase;
-  font-size: calc(0ץ2rem + min(1.5vw, 0.5rem));
+  font-size: calc(01rem + min(0.5vw, 0.5rem));
   font-weight: 900;
   letter-spacing: -0.05ch;
   line-height: 0.9;

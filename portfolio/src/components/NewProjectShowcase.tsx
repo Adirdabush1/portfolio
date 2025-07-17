@@ -10,21 +10,19 @@ gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 const projects = [
   {
     title: "Samurai Knives Web Project",
+    link: "https://github.com/Adirdabush1/samurai-knives-web",
     image: "/samurai1.png",
     poetry: `Shadows cast by the fading light,\nWhispers of steel, a sacred rite,\nHand-forged blades in crimson night,\nA warrior's grace, eternal fight.`,
   },
   {
     title: "RateChat – AI Chat Platform",
+    link: "https://github.com/Adirdabush1/RateChat",
     image: "/login ratechat.png",
     poetry: `Voices rise in coded streams,\nWords are weighed in mindful beams,\nA child speaks safe, the system deems,\nRateChat guards their digital dreams.`,
   },
   {
-    title: "Samurai Knives Gallery",
-    image: "/samurai2.png",
-    poetry: `The blade reflects a thousand years,\nIn silence speaks the smith's own tears,\nDisplayed with pride, the soul appears,\nA scroll of steel through time reveres.`,
-  },
-  {
     title: "TimesHub – Time Tracker",
+    link: "https://github.com/Adirdabush1/TimesHub",
     image: "/timeshub.png",
     poetry: `Each moment counts, no time to hide,\nA hub where ticking thoughts reside,\nTypeScript binds the future wide,\nTimesHub leads where goals abide.`,
   },
@@ -38,7 +36,6 @@ export default function NewProjectShowcase() {
       effects: true,
     });
 
-    // אפקט הגדלת רדיוס המעגל
     gsap.utils.toArray<SVGCircleElement>(".mask-circle").forEach((circle) => {
       gsap.to(circle, {
         scrollTrigger: {
@@ -56,13 +53,21 @@ export default function NewProjectShowcase() {
     <div id="projects-container" className="project-showcase">
       <section className="intro-section">
         <h1 className="intro-title">Explore My Projects</h1>
-        <p className="intro-sub">Scroll down to see more</p>
       </section>
 
       {projects.map((project, idx) => (
         <section className="project-section" key={idx}>
           <div className="project-text">
-            <h2 className="project-title">{project.title}</h2>
+            <h2 className="project-title">
+              <a
+                href={project.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="project-link"
+              >
+                {project.title}
+              </a>
+            </h2>
             <p className="project-description">{project.poetry}</p>
           </div>
           <div className="project-image-wrapper">

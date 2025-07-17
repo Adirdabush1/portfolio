@@ -14,16 +14,17 @@ import "./HomePage.css";
 
 export default function HomePage() {
   const rotatingTexts = [
-    "Full Stack Developer",
-    "React Enthusiast",
-    "Open Source Contributor",
-    "Lifelong Learner"
-  ];
+  "Full Stack & Mobile Developer",
+  "React · React Native · Node.js · TypeScript",
+  "Building Web & Mobile Apps from Scratch",
+  "Clean Code. Scalable Solutions. Real Impact"
+];
+
 
   return (
     <div id="projects-container" style={{ overflowX: "hidden" }}>
+      <Navbar />
       <div className="homepage-container" id="home">
-        <Navbar />
         <UseScrollAnimation />
 
         <svg width="0" height="0" aria-hidden="true" style={{ position: 'absolute' }}>

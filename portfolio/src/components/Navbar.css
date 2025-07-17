@@ -31,7 +31,6 @@ html {
   color: #000;
 }
 
-/* תפריט Overlay */
 .wrapper {
   position: fixed;
   top: 0;
@@ -40,18 +39,21 @@ html {
   height: 100vh;
   background: #000000ee;
   clip-path: circle(25px at calc(100% - 45px) 45px);
-  transition: clip-path 0.5s ease-in-out;
+  transition: clip-path 0.5s ease-in-out, opacity 0.3s ease;
   pointer-events: none;
   user-select: none;
   z-index: 10000;
   overflow: hidden;
+  opacity: 0;
 }
 
 .wrapper.active {
   clip-path: circle(150% at 50% 50%);
   pointer-events: auto;
   user-select: auto;
+  opacity: 1;
 }
+
 
 /* רשימת קישורים */
 .wrapper ul {
@@ -76,7 +78,7 @@ html {
   font-weight: 600;
   padding: 10px 40px;
   border-radius: 30px;
-  background: linear-gradient(45deg, #14ffe9, #ffeb3b, #ff00e0);
+  background: linear-gradient(45deg, #ffffff, #c0c0c0, #353737, );
   background-size: 200% 200%;
   animation: gradientMove 4s ease infinite;
   display: inline-block;

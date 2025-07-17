@@ -43,13 +43,13 @@ html {
 }
 
 .hero-content {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 4rem;
   flex-wrap: wrap;
 }
-
 
 .hero {
   margin-top: 4rem;
@@ -105,16 +105,61 @@ html {
   transition: transform 0.3s ease;
 }
 
-
 .hero-image {
+  position: fixed;
+  top: 100px;
+  right: 100px;
   width: 320px;
   height: 320px;
   border-radius: 50%;
   border: 3px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1);
+  z-index: 10;
+  transition: all 0.3s ease;
 }
 
+/* למסכים גדולים יחסית, מעל 1200px */
+@media (max-width: 1200px) {
+  .hero-image {
+    top: 80px;
+    right: 80px;
+    width: 280px;
+    height: 280px;
+  }
+}
 
+/* למסכים בינוניים, עד 992px */
+@media (max-width: 992px) {
+  .hero-image {
+    top: 60px;
+    right: 60px;
+    width: 220px;
+    height: 220px;
+  }
+}
+
+/* למסכים קטנים יחסית, עד 768px */
+@media (max-width: 768px) {
+  .hero-image {
+    position: static;
+    width: 80vw;
+    max-width: 200px;
+    height: auto;
+    margin-top: 2rem;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* למובייל מאוד קטנים, עד 480px */
+@media (max-width: 480px) {
+  .hero-image {
+    width: 60vw;
+    max-width: 150px;
+    margin-top: 1rem;
+  }
+}
 
 @keyframes fadeIn {
   to {
@@ -137,32 +182,5 @@ html {
     transform: scaleX(1);
     filter: blur(0px);
     opacity: 1;
-  }
-}
-
-@media (max-width: 768px) {
-  .hero-content {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .hero-title-inline {
-    font-size: 2.5rem;
-    white-space: normal;
-  }
-
-  .hero-subtitle-filtered {
-    font-size: 1.2rem;
-    width: 100%;
-  }
-
-  .hero-image {
-    margin-left: 0;
-    margin-top: 2rem;
-    max-width: 80vw;
-  }
-
-  .homepage-container {
-    padding: 2rem;
   }
 }

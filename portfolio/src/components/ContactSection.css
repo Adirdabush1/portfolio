@@ -1,27 +1,33 @@
-/* ContactSection.css */
-
+/* כללי */
 body {
   margin: 0;
-  padding: 0;
+  padding: 0 10px 100px;
+  /* קצת padding צדדי למכשירים קטנים */
   background-color: #000;
-  padding-bottom: 100px;
 }
 
+/* מיכל כללי */
 #contact {
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
+  /* לפחות גובה מלא */
+  box-sizing: border-box;
+  padding: 20px 0;
 }
 
+/* כותרת */
 .section-header {
   text-align: center;
-  margin: 0 auto;
-  padding: 40px 0;
+  margin: 0 auto 40px;
   font: 300 60px 'Oswald', sans-serif;
   color: #fff;
   text-transform: uppercase;
   letter-spacing: 6px;
+  max-width: 90vw;
+  word-break: break-word;
 }
 
+/* עיצוב עמוד יצירת קשר */
 .contact-wrapper {
   display: flex;
   flex-direction: row;
@@ -30,90 +36,95 @@ body {
   padding: 20px;
   position: relative;
   max-width: 840px;
+  gap: 30px;
+  /* רווח בין עמודות */
+  box-sizing: border-box;
 }
 
-/* Left contact page */
+/* טפסים */
 .form-horizontal {
   max-width: 400px;
+  width: 100%;
+  /* מלא רוחב בתוך המיכל */
   font-family: 'Lato', sans-serif;
   font-weight: 400;
 }
 
+/* שדות */
 .form-control,
 textarea {
   width: 100%;
-  /* רוחב מלא */
-  max-width: 400px;
-  /* מקסימום רוחב לשדה */
   background-color: rgb(30, 30, 30);
   color: #fff;
   letter-spacing: 1px;
   border: 1px solid #444;
   padding: 1rem 1.2rem;
-  /* הגברנו קצת padding לשדה גבוה יותר */
   border-radius: 6px;
   box-sizing: border-box;
   resize: vertical;
   font-size: 1.1rem;
-  height: auto;
-  /* לא לקבוע גובה קשיח ל-input */
   min-height: 40px;
-  /* גובה מינימום של 40 פיקסלים לשדות input */
+  margin-bottom: 15px;
 }
 
-/* נוכל להוסיף גובה מינימום ל-textarea */
+/* טקסט ארוך */
 textarea {
   min-height: 180px;
-  /* יותר גבוה מהברירת מחדל */
   padding-top: 1rem;
   padding-bottom: 1rem;
 }
 
-
+/* כפתורים */
 .send-button {
   margin-top: 15px;
-  height: 34px;
-  width: 400px;
+  height: 40px;
+  width: 100%;
+  /* תופס את רוחב הטופס */
+  max-width: 400px;
   overflow: hidden;
-  transition: all .2s ease-in-out;
+  transition: all 0.2s ease-in-out;
   cursor: pointer;
   background-color: #007bff;
   border: none;
   color: #fff;
   border-radius: 6px;
+  font-weight: 600;
+  font-size: 1.1rem;
 }
 
 .alt-send-button {
-  width: 400px;
-  height: 34px;
-  transition: all .2s ease-in-out;
+  width: 100%;
+  max-width: 400px;
+  height: 40px;
+  transition: all 0.2s ease-in-out;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .send-text {
-  display: block;
   margin-top: 10px;
   font: 700 12px 'Lato', sans-serif;
   letter-spacing: 2px;
 }
 
 .alt-send-button:hover {
-  transform: translate3d(0px, -29px, 0px);
+  transform: translate3d(0, -29px, 0);
 }
 
-/* Right Contact Page */
+/* צד ימין - פרטי יצירת קשר */
 .direct-contact-container {
   max-width: 400px;
+  width: 100%;
   color: #bbb;
   font-family: 'Lato', sans-serif;
 }
 
-/* Location, Phone, Email Section */
+/* רשימה */
 .contact-list {
-  list-style-type: none;
-  margin-left: -30px;
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
   padding-right: 20px;
 }
 
@@ -122,10 +133,12 @@ textarea {
   color: #aaa;
 }
 
+/* טקסטים */
 .contact-text {
   font: 300 18px 'Lato', sans-serif;
   letter-spacing: 1.9px;
   color: #bbb;
+  word-wrap: break-word;
 }
 
 .place {
@@ -151,7 +164,7 @@ textarea {
   text-decoration: none;
 }
 
-/* Social Media Icons */
+/* אייקונים - מדיה חברתית */
 .social-media-list {
   font-size: 22px;
   text-align: center;
@@ -161,19 +174,22 @@ textarea {
   display: flex;
   justify-content: center;
   gap: 12px;
+  flex-wrap: wrap;
+  /* שורות במידת הצורך */
 }
 
 .social-media-list li {
-  display: inline-block;
+  display: inline-flex;
+  /* inline-flex כדי למרכז אייקון טוב */
+  align-items: center;
+  justify-content: center;
   height: 60px;
   width: 60px;
-  line-height: 60px;
   border-radius: 50%;
   color: #fff;
   background-color: rgb(27, 27, 27);
   cursor: pointer;
-  transition: all .2s ease-in-out;
-  text-align: center;
+  transition: all 0.2s ease-in-out;
   font-size: 28px;
 }
 
@@ -194,25 +210,27 @@ textarea {
 }
 
 hr {
-  border-color: rgba(255, 255, 255, .6);
+  border-color: rgba(255, 255, 255, 0.6);
   margin: 20px 0;
 }
 
 /* Responsive */
-
 @media screen and (max-width: 850px) {
   .contact-wrapper {
     flex-direction: column;
+    align-items: center;
+    gap: 40px;
   }
 
   .direct-contact-container,
   .form-horizontal {
+    max-width: 350px;
+    width: 100%;
     margin: 0 auto;
   }
 
   .direct-contact-container {
-    margin-top: 60px;
-    max-width: 300px;
+    margin-top: 30px;
   }
 
   .social-media-list li {
@@ -225,41 +243,35 @@ hr {
 @media screen and (max-width: 569px) {
 
   .direct-contact-container,
-  .form-wrapper {
-    float: none;
-    margin: 0 auto;
+  .form-horizontal {
+    max-width: 280px;
   }
 
   .form-control,
   textarea {
-    margin: 0 auto;
+    margin: 0 auto 15px;
   }
 
   .name,
   .email,
   textarea {
-    width: 280px;
-  }
-
-  .direct-contact-container {
-    margin-top: 60px;
+    width: 100%;
     max-width: 280px;
   }
 
-  .social-media-list {
-    left: 0;
+  .direct-contact-container {
+    margin-top: 30px;
   }
 
   .social-media-list li {
     height: 55px;
     width: 55px;
-    line-height: 55px;
     font-size: 2rem;
   }
 }
 
 @media screen and (max-width: 410px) {
   .send-button {
-    width: 99%;
+    width: 100%;
   }
 }

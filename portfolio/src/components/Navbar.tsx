@@ -4,7 +4,12 @@ import "./Navbar.css";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleMenu = () => setIsOpen(!isOpen);
+  const toggleMenu = () => {
+  const newState = !isOpen;
+  setIsOpen(newState);
+  document.body.classList.toggle("menu-open", newState);
+};
+
 
   useEffect(() => {
     document.body.classList.toggle("menu-open", isOpen);

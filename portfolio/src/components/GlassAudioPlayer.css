@@ -6,10 +6,21 @@
   --lg-grey: #5b5b5b;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
 .container {
   display: flex;
   justify-content: center;
+  align-items: center;
   padding: 2rem;
+  width: 100%;
 }
 
 .container--inline {
@@ -31,7 +42,7 @@
 }
 
 .glass-container--large {
-  min-width: 320px;
+  min-width: 300px;
 }
 
 .glass-filter {
@@ -75,7 +86,8 @@
 }
 
 .player__img {
-  width: 120px;
+  width: 100%;
+  max-width: 160px;
   border-radius: 1rem;
   margin-bottom: 0.5rem;
 }
@@ -94,7 +106,6 @@
   text-shadow: 0 0 2px #000;
 }
 
-/* כפתור זכוכית במקום play-button */
 .glass-play-button {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -123,6 +134,7 @@
 
 .audio-range {
   width: 100%;
+  max-width: 100%;
   cursor: pointer;
   accent-color: #ffffff;
   margin: 0.5rem 0;
@@ -134,7 +146,39 @@
 .time-display {
   display: flex;
   justify-content: space-between;
-  width: 90%;
+  width: 100%;
   font-size: 0.9rem;
   color: #ccc;
+}
+
+/* Responsive behavior */
+@media screen and (max-width: 480px) {
+  .glass-content {
+    padding: 1.5rem 1rem;
+  }
+
+  .player__img {
+    max-width: 120px;
+  }
+
+  .glass-play-button {
+    font-size: 1rem;
+    padding: 0.5rem 1.2rem;
+  }
+
+  .player__legend__title {
+    font-size: 1rem;
+  }
+
+  .player__legend__sub-title {
+    font-size: 0.8rem;
+  }
+
+  .audio-range {
+    height: 5px;
+  }
+
+  .time-display {
+    font-size: 0.8rem;
+  }
 }

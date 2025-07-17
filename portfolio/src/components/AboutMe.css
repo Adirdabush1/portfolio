@@ -20,14 +20,20 @@ body {
 
 /* סקשן כללי */
 .about-section {
+  display: flex;
+  flex-direction: column;
+  /* חשוב - מסדר את הילדים (כותרת וטקסט) בטור */
+  align-items: center;
+  /* מרכז את הילדים אופקית */
   background: #000;
   color: #fff;
   padding: clamp(2rem, 5vw, 4rem) 1rem;
-  /* ריווח גמיש */
-  text-align: center;
   max-width: 900px;
   margin: 0 auto;
+  text-align: center;
+  /* מרכז טקסטים */
 }
+
 
 /* כותרת גדולה עם גודל רספונסיבי */
 .spotlight-heading {

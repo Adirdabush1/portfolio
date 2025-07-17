@@ -75,7 +75,7 @@ export default function GlassAudioPlayer() {
 
           <div className="player__controls">
             <button className="glass-play-button" onClick={togglePlay}>
-              {isPlaying ? "⏸️ Pause" : "▶️ Play"}
+              {isPlaying ? "⏸Pause" : "▶ Play"}
             </button>
           </div>
 

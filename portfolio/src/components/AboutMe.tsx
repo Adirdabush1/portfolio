@@ -50,18 +50,18 @@ export default function AboutMe() {
       </h1>
 
       <div className="text-block">
-        <p>
-          My journey began with a passion for building beautiful and intuitive
-          experiences. Every project became an opportunity to grow, to
-          experiment, and to improve. I’ve learned from challenges and
-          transformed failures into milestones.
-        </p>
-        <p>
-          Today, I combine visual creativity with smart functionality—bringing
-          together intuition and strategy. The projects I build don’t just solve
-          problems—they tell stories.
-        </p>
-      </div>
+  <p>
+    I'm a self-driven developer who doesn't wait for instructions to start building.
+    Beyond my formal studies in full-stack development, I took it upon myself to master <strong>TypeScript</strong> and <strong>NestJS</strong>—learning them from scratch and applying them in real backend projects with real users.
+  </p>
+  <p>
+    I designed and built structured APIs, implemented <strong>JWT authentication</strong>, and connected external <strong>LLM APIs</strong> to create intelligent systems—like a smart chat app that analyzes tone, filters content, and sends alerts automatically.
+  </p>
+  <p>
+    For me, coding isn’t just about completing assignments—it's about solving real problems, staying curious, and building things that actually work. That mindset is what I bring to every team I join.
+  </p>
+</div>
+
     </section>
   );
 }

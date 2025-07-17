@@ -20,7 +20,7 @@ export default function AiAssistant() {
   ];
 
   useEffect(() => {
-    setQuestion(suggestedQuestions[0]);
+    setQuestion("");
   }, []);
 
   const askAI = async () => {

@@ -200,7 +200,7 @@ const RotatingText = forwardRef<RotatingTextRef, RotatingTextProps>(
         <AnimatePresence mode={animatePresenceMode} initial={animatePresenceInitial}>
           <motion.div
             key={currentTextIndex}
-            className="text-rotate"
+            className="text-rotate-line"
             layout
             aria-hidden="true"
           >

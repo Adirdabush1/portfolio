@@ -127,3 +127,13 @@ body {
     max-height: 40vh;
   }
 }
+
+.project-link {
+  color: inherit;
+  text-decoration: none;
+  font: inherit;
+}
+
+.project-link:hover {
+  text-decoration: underline;
+}
