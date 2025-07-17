@@ -15,7 +15,6 @@ import "./HomePage.css";
 
 export default function HomePage() {
   const rotatingTexts = [
-  "Full Stack web & Mobile Developer",
   "React · React Native · Node.js · TypeScript",
   "Building Web & Mobile Apps from Scratch",
   "Clean Code. Scalable Solutions. Real Impact"
