@@ -14,7 +14,7 @@ import "./HomePage.css";
 
 export default function HomePage() {
   const rotatingTexts = [
-  "Full Stack & Mobile Developer",
+  "Full Stack web & Mobile Developer",
   "React · React Native · Node.js · TypeScript",
   "Building Web & Mobile Apps from Scratch",
   "Clean Code. Scalable Solutions. Real Impact"
@@ -48,7 +48,7 @@ export default function HomePage() {
 
 
             
-            
+
               <RotatingText texts={rotatingTexts} rotationInterval={4000} />
             <WantToSeeMore />
           
