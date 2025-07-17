@@ -46,12 +46,12 @@ export default function HomePage() {
               Hey I'm Adir
             </GradientText>
 
-            <div className="hero-subtitle-filtered">
-              <RotatingText texts={rotatingTexts} rotationInterval={3000} />
-            </div>
 
+            
+            
+              <RotatingText texts={rotatingTexts} rotationInterval={4000} />
             <WantToSeeMore />
-          </div>
+          
 
           <img
             src="/homepage.jpg"
@@ -59,6 +59,7 @@ export default function HomePage() {
             className="hero-image puff-in-hor"
           />
         </div>
+            </div>
       </div>
 
       <section id="about-me-section">

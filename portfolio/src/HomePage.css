@@ -5,7 +5,6 @@
   --font-family: "Poppins", sans-serif;
 }
 
-/* כלל Box sizing לכולם */
 *,
 *::before,
 *::after {
@@ -17,7 +16,6 @@ html {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  /* חשוב! מונע גלילה אופקית */
   font-family: var(--font-family);
   height: 100%;
   width: 100%;
@@ -65,17 +63,26 @@ html {
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 4rem;
   flex-wrap: wrap;
   overflow-x: hidden;
-  /* הוסף */
-
+  padding-right: 340px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 992px) {
   .hero-content {
-    gap: 1rem;
+    padding-right: 240px;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-content {
+    padding-right: 0;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 }
 
@@ -96,7 +103,6 @@ html {
   margin: 0;
   padding: 0.5rem;
   color: var(--color-secondary);
-  /* white-space: nowrap; */
 }
 
 .hero-subtitle-filtered .text-rotate {
@@ -126,7 +132,7 @@ html {
 .hero-image {
   position: fixed;
   top: 100px;
-  right: 100px;
+  right: 20px;
   width: 320px;
   height: 320px;
   border-radius: 50%;
@@ -139,7 +145,7 @@ html {
 @media (max-width: 1200px) {
   .hero-image {
     top: 80px;
-    right: 80px;
+    right: 20px;
     width: 280px;
     height: 280px;
   }
@@ -147,27 +153,24 @@ html {
 
 @media (max-width: 992px) {
   .hero-image {
-    position: static;
-    width: 80vw;
-    max-width: 200px;
-    height: auto;
-    margin-top: 2rem;
-    border-radius: 50%;
-    border: 3px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1);
+    top: 80px;
+    right: 15px;
+    width: 220px;
+    height: 220px;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .hero-image {
-    width: 60vw;
-    max-width: 150px;
-    margin-top: 1rem;
+    position: static;
+    width: 150px;
+    height: 150px;
+    margin: 2rem auto 0;
+    display: block;
   }
 }
 
 /* אנימציות */
-
 @keyframes fadeIn {
   to {
     opacity: 1;
