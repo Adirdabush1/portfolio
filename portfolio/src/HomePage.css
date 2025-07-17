@@ -5,14 +5,22 @@
   --font-family: "Poppins", sans-serif;
 }
 
+/* כלל Box sizing לכולם */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body,
 html {
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
+  /* חשוב! מונע גלילה אופקית */
   font-family: var(--font-family);
   height: 100%;
   width: 100%;
-  overflow-x: hidden;
   color: var(--color-secondary);
   background: linear-gradient(-45deg, #0a0f0f, #1a1f1f, #223333);
   background-size: 400% 400%;
@@ -38,8 +46,19 @@ html {
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-sizing: border-box;
   width: 100vw;
+}
+
+@media (max-width: 992px) {
+  .homepage-container {
+    padding: 4rem 3rem 6rem 3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .homepage-container {
+    padding: 2rem 1rem 4rem 1rem;
+  }
 }
 
 .hero-content {
@@ -49,20 +68,26 @@ html {
   justify-content: center;
   gap: 4rem;
   flex-wrap: wrap;
+  overflow-x: hidden;
+  /* הוסף */
+
+}
+
+@media (max-width: 480px) {
+  .hero-content {
+    gap: 1rem;
+  }
 }
 
 .hero {
-  margin-top: 4rem;
-  /* מוסיף ריווח מלמעלה */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
-  /* מרווח בין הכותרת לטקסט */
-  max-width: 100%;
+  max-width: 700px;
+  margin: 4rem auto 0;
   text-align: center;
   color: var(--color-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
 }
 
 .hero-title-inline {
@@ -71,10 +96,9 @@ html {
   margin: 0;
   padding: 0.5rem;
   color: var(--color-secondary);
-  white-space: nowrap;
+  /* white-space: nowrap; */
 }
 
-/* עיצוב כותרת משנה מונפשת כמו Super CSS World */
 .hero-subtitle-filtered .text-rotate {
   display: flex;
   flex-wrap: wrap;
@@ -85,7 +109,6 @@ html {
   letter-spacing: -0.05ch;
   line-height: 1;
   color: white;
-
   -webkit-text-stroke: 2px black;
   text-shadow: 4px 4px black;
   paint-order: stroke fill;
@@ -98,11 +121,6 @@ html {
 .text-rotate-space {
   display: inline-block;
   width: 0.4em;
-}
-
-.hero-subtitle-filtered .text-rotate-element {
-  display: inline-block;
-  transition: transform 0.3s ease;
 }
 
 .hero-image {
@@ -118,7 +136,6 @@ html {
   transition: all 0.3s ease;
 }
 
-/* למסכים גדולים יחסית, מעל 1200px */
 @media (max-width: 1200px) {
   .hero-image {
     top: 80px;
@@ -128,18 +145,7 @@ html {
   }
 }
 
-/* למסכים בינוניים, עד 992px */
 @media (max-width: 992px) {
-  .hero-image {
-    top: 60px;
-    right: 60px;
-    width: 220px;
-    height: 220px;
-  }
-}
-
-/* למסכים קטנים יחסית, עד 768px */
-@media (max-width: 768px) {
   .hero-image {
     position: static;
     width: 80vw;
@@ -152,7 +158,6 @@ html {
   }
 }
 
-/* למובייל מאוד קטנים, עד 480px */
 @media (max-width: 480px) {
   .hero-image {
     width: 60vw;
@@ -160,6 +165,8 @@ html {
     margin-top: 1rem;
   }
 }
+
+/* אנימציות */
 
 @keyframes fadeIn {
   to {
