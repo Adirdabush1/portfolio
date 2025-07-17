@@ -130,7 +130,8 @@ html {
 }
 
 .hero-image {
-  position: fixed;
+  position: absolute;
+  /* ✅ ככה היא תזוז יחד עם הגלילה */
   top: 100px;
   right: 20px;
   width: 320px;
