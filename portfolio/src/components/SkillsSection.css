@@ -1,0 +1,93 @@
+.skills-section {
+  padding: 4rem 1rem;
+  text-align: center;
+  background: transparent;
+}
+
+.skills-section h2 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: var(--color-secondary);
+}
+
+.skills-list {
+  --col-gap: 2rem;
+  --barH: 1rem;
+  --roleH: 2rem;
+  --flapH: 2rem;
+
+  width: min(60rem, 90%);
+  margin-inline: auto;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--col-gap);
+  padding-inline: calc(var(--col-gap) / 2);
+  justify-content: center;
+  align-items: flex-start;
+  list-style: none;
+}
+
+.skills-list li {
+  width: 10em;
+  display: grid;
+  grid-template:
+    "role"
+    "icon"
+    "title"
+    "descr";
+  align-items: flex-start;
+  gap: 1rem;
+  padding-block-end: calc(var(--flapH) + 1rem);
+  text-align: center;
+  background: var(--accent-color);
+  background-image: linear-gradient(rgba(0, 0, 0, 0.6) var(--roleH),
+      rgba(0, 0, 0, 0.4) calc(var(--roleH) + 0.5rem),
+      rgba(0, 0, 0, 0) calc(var(--roleH) + 0.5rem + 5rem));
+  clip-path: polygon(calc(var(--col-gap) / -2 - 5px) 0,
+      calc(100% + var(--col-gap) / 2 + 5px) 0,
+      calc(100% + var(--col-gap) / 2 + 5px) calc(100% - var(--flapH)),
+      50% 100%,
+      calc(var(--col-gap) / -2 - 5px) calc(100% - var(--flapH)));
+}
+
+/* bar */
+.skills-list li::before {
+  content: "";
+  grid-area: role;
+  height: var(--barH);
+  width: calc(100% + var(--col-gap));
+  margin-left: calc(var(--col-gap) / -2);
+  margin-top: calc(var(--roleH) / 2 - var(--barH) / 2);
+  background: rgba(255, 255, 255, 0.1);
+  z-index: -1;
+}
+
+/* role */
+.skills-list li::after {
+  content: "";
+  grid-area: role;
+  background: var(--accent-color);
+  height: var(--roleH);
+}
+
+.skills-list li .icon,
+.skills-list li .title,
+.skills-list li .descr {
+  padding-inline: 1rem;
+  color: white;
+  text-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.5);
+}
+
+.skills-list li .icon {
+  font-size: 3rem;
+}
+
+.skills-list li .title {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.skills-list li .descr {
+  font-size: 0.9rem;
+}

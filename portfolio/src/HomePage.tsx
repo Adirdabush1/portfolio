@@ -9,6 +9,7 @@ import UseScrollAnimation from "./useScrollAnimation";
 import WantToSeeMore from "./components/WantToSeeMore";
 import NewProjectShowcase from "./components/NewProjectShowcase";
 import AiAssistant from "./components/AiaSSISTANT";
+import SkillsSection from "./components/SkillsSection"
 import ContactSection from "./components/ContactSection";
 import "./HomePage.css";
 
@@ -49,8 +50,6 @@ export default function HomePage() {
 
             
 
-              <RotatingText texts={rotatingTexts} rotationInterval={4000} />
-            <WantToSeeMore />
           
 
           <img
@@ -58,10 +57,15 @@ export default function HomePage() {
             alt="My SVG"
             className="hero-image puff-in-hor"
           />
+              <RotatingText texts={rotatingTexts} rotationInterval={4000} />
+            <WantToSeeMore />
         </div>
             </div>
       </div>
 
+      <section id="SkillsSection-section">
+        <SkillsSection></SkillsSection>
+      </section>
       <section id="about-me-section">
         <AboutMeSection />
       </section>

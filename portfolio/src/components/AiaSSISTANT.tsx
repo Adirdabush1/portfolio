@@ -71,7 +71,7 @@ export default function AiAssistant() {
   <div><div>Adir</div></div>
   <div><div>Agent Smith</div></div>
   <div><div>The Developer</div></div>
-  <div><div>Writing about Adir</div></div>
+ 
 </div>{" "}
 Whatever you want!
 
