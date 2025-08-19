@@ -1,4 +1,3 @@
-// components/PrivacyNotice13.tsx
 import React, { useState } from "react";
 
 interface PrivacyNotice13Props {
@@ -27,14 +26,12 @@ const PrivacyNotice13: React.FC<PrivacyNotice13Props> = ({ onConsentChange }) =>
         />
         <span className="text-sm text-gray-200">
           By using this service, you agree to our{" "}
-          <a
-            href="/privacy.html"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-400 underline"
+          <span
+            className="text-blue-400 underline cursor-pointer"
+            onClick={() => window.open("/privacy.html", "_blank")}
           >
             Privacy Policy
-          </a>{" "}
+          </span>{" "}
           and consent to receive information.
         </span>
       </label>
