@@ -87,8 +87,8 @@ export default function HomePage() {
       </section>
 
       <section id="contact">
-        <PrivacyNotice13 onConsentChange={(consent) => console.log("Consent changed:", consent)} />
         <ContactSection />
+        <PrivacyNotice13 onConsentChange={(consent) => console.log("Consent changed:", consent)} />
       </section>
     </div>
   );

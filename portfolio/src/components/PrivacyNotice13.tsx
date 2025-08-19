@@ -26,11 +26,16 @@ const PrivacyNotice13: React.FC<PrivacyNotice13Props> = ({ onConsentChange }) =>
           className="w-4 h-4"
         />
         <span className="text-sm text-gray-200">
-          אני מאשר/ת שקראתי את{" "}
-          <a href="/privacy" className="text-blue-400 underline">
-            מדיניות הפרטיות
+          By using this service, you agree to our{" "}
+          <a
+            href="/privacy.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-400 underline"
+          >
+            Privacy Policy
           </a>{" "}
-          ומסכים/ה לקבלת מידע.
+          and consent to receive information.
         </span>
       </label>
     </div>
