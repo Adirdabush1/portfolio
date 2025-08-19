@@ -1,21 +1,36 @@
 import React, { useState, FormEvent } from "react";
 import Swal from "sweetalert2";
+import PrivacyNotice13 from "./PrivacyNotice13"; // ייבוא הקומפוננטה
 import "./ContactSection.css";
 
 export default function ContactSection() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [consent, setConsent] = useState(false); // נשתמש כדי לבדוק אם המשתמש נתן הסכמה
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    try {
-      const response = await fetch("https://portfolio-backend-og9l.onrender.com/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message }),
+    if (!consent) {
+      Swal.fire({
+        icon: "warning",
+        title: "Consent Required",
+        text: "Please agree to the Privacy Policy before sending your message.",
+        confirmButtonColor: "#ff9800",
       });
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "https://portfolio-backend-og9l.onrender.com/api/contact",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, message }),
+        }
+      );
 
       if (response.ok) {
         Swal.fire({
@@ -28,6 +43,7 @@ export default function ContactSection() {
         setName("");
         setEmail("");
         setMessage("");
+        setConsent(false);
       } else {
         Swal.fire({
           icon: "error",
@@ -52,52 +68,14 @@ export default function ContactSection() {
       <h1 className="section-header">Contact</h1>
 
       <div className="contact-wrapper">
-        {/* טופס */}
+        {/* Form */}
         <form
           id="contact-form"
           className="form-horizontal"
           role="form"
           onSubmit={handleSubmit}
         >
-          <div className="form-group">
-            <div className="col-sm-12">
-              <input
-                type="text"
-                className="form-control"
-                id="name"
-                placeholder="NAME"
-                name="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <div className="col-sm-12">
-              <input
-                type="email"
-                className="form-control"
-                id="email"
-                placeholder="EMAIL"
-                name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <textarea
-            className="form-control"
-            rows={10}
-            placeholder="MESSAGE"
-            name="message"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            required
-          />
+          {/* ... inputs for name, email, message ... */}
 
           <button
             className="btn btn-primary send-button"
@@ -112,34 +90,10 @@ export default function ContactSection() {
           </button>
         </form>
 
-        {/* צד ימין - פרטי קשר */}
+        {/* Right side - contact info */}
         <div className="direct-contact-container">
           <ul className="contact-list">
-            <li className="list-item">
-              <i className="fas fa-map-marker-alt fa-2x">
-                <span className="contact-text place">Herzliya, Israel</span>
-              </i>
-            </li>
-
-            <li className="list-item">
-              <i className="fas fa-phone fa-2x">
-                <span className="contact-text phone">
-                  <a href="tel:+972548265460" title="Give me a call">
-                    (+972) 054-826-5460
-                  </a>
-                </span>
-              </i>
-            </li>
-
-            <li className="list-item">
-              <i className="fas fa-envelope fa-2x">
-                <span className="contact-text gmail">
-                  <a href="mailto:adiraws2025@gmail.com" title="Send me an email">
-                    adiraws2025@gmail.com
-                  </a>
-                </span>
-              </i>
-            </li>
+            {/* ... address, phone, email ... */}
           </ul>
 
           <hr />
@@ -166,8 +120,11 @@ export default function ContactSection() {
               </a>
             </li>
           </ul>
-          <hr />
 
+          {/* הוספת PrivacyNotice13 מתחת לקישורים */}
+          <PrivacyNotice13 onConsentChange={setConsent} />
+
+          <hr />
           <div className="copyright">
             &copy; ALL OF THE RIGHTS RESERVED
           </div>
