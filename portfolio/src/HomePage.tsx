@@ -12,6 +12,7 @@ import AiAssistant from "./components/AiaSSISTANT";
 import SkillsSection from "./components/SkillsSection"
 import ContactSection from "./components/ContactSection";
 import "./HomePage.css";
+import PrivacyNotice13 from "./components/PrivacyNotice13";
 
 export default function HomePage() {
   const rotatingTexts = [
@@ -86,6 +87,7 @@ export default function HomePage() {
       </section>
 
       <section id="contact">
+        <PrivacyNotice13 onConsentChange={(consent) => console.log("Consent changed:", consent)} />
         <ContactSection />
       </section>
     </div>
