@@ -9,6 +9,12 @@ gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
 const projects = [
   {
+    title: "CodeMode – Personal Project Showcase",
+    link: "https://codemode.onrender.com",
+    image: "/CodeMode.png", // ודא שהתמונה ב-public או בנתיב הנכון
+    poetry: `A canvas for code, sleek and bright,\nWhere ideas flow and visions ignite,\nProjects come to life in digital light,\nCodeMode shines with creative might.`,
+  },
+  {
     title: "Samurai Knives Web Project",
     link: "https://github.com/Adirdabush1/samurai-knives-web",
     image: "/samurai1.png",
@@ -27,6 +33,7 @@ const projects = [
     poetry: `Each moment counts, no time to hide,\nA hub where ticking thoughts reside,\nTypeScript binds the future wide,\nTimesHub leads where goals abide.`,
   },
 ];
+
 
 export default function NewProjectShowcase() {
   useEffect(() => {
