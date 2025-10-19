@@ -86,6 +86,7 @@ const skills = [
     color: "#FF69B4",
     description: "Modern UI and animation design.",
   },
+  
 ];
 
 const SkillsSection = () => {
