@@ -86,7 +86,24 @@ const skills = [
     color: "#FF69B4",
     description: "Modern UI and animation design.",
   },
-  
+  {
+    icon: "fa-brands fa-docker",
+    title: "Docker / Docker Compose",
+    color: "#228ddfff",
+    description: "Containerization and multi-container orchestration.",
+  },
+  {
+    icon: "fa-brands fa-aws",
+    title: "AWS",
+    color: "#FF9900",
+    description: "Cloud deployment, EC2, S3, and serverless functions.",
+  },
+  {
+    icon: "fa-solid fa-network-wired",
+    title: "Kubernetes",
+    color: "#326ce5",
+    description: "Container orchestration, scaling, and management.",
+  },
 ];
 
 const SkillsSection = () => {
