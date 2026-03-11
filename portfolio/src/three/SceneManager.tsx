@@ -68,16 +68,10 @@ export default function SceneManager() {
   }, []);
 
   const handleLoadComplete = useCallback(() => {
-    // Unlock scroll and reset to top so the hero section doesn't auto-scroll
-    document.body.style.overflow = "";
-    document.documentElement.style.overflow = "";
     window.scrollTo(0, 0);
     scrollProgressRef.current = 0;
     setLoaded(true);
-    // Refresh ScrollTrigger after loading — delay more on mobile for layout recalc
-    setTimeout(() => {
-      ScrollTrigger.refresh(true);
-    }, 300);
+    setTimeout(() => ScrollTrigger.refresh(true), 300);
   }, []);
 
   useEffect(() => {
@@ -87,9 +81,10 @@ export default function SceneManager() {
     const scene = new THREE.Scene();
     sceneRef.current = scene;
 
+    const smallScreen = window.innerWidth < 768;
     const renderer = new THREE.WebGLRenderer({
       canvas,
-      antialias: true,
+      antialias: !smallScreen,
       alpha: true,
       powerPreference: "high-performance",
     });
@@ -143,10 +138,6 @@ export default function SceneManager() {
     s.convergence = new Convergence(scene);
 
     // GSAP ScrollTrigger
-    // Lock scroll during loading
-    document.body.style.overflow = "hidden";
-    document.documentElement.style.overflow = "hidden";
-
     const scrollTrigger = ScrollTrigger.create({
       trigger: "#page-wrapper",
       start: "top top",
@@ -218,8 +209,6 @@ export default function SceneManager() {
     animate();
 
     return () => {
-      document.body.style.overflow = "";
-      document.documentElement.style.overflow = "";
       clearInterval(loadInterval);
       cancelAnimationFrame(rafRef.current);
       scrollTrigger.kill();

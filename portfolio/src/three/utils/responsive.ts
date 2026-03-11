@@ -7,7 +7,7 @@ export function isSmallScreen(): boolean {
 }
 
 export function getPixelRatio(): number {
-  if (window.innerWidth < 768) return Math.min(window.devicePixelRatio, 1.5);
+  if (window.innerWidth < 768) return 1;
   return Math.min(window.devicePixelRatio, 2);
 }
 
