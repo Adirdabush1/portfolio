@@ -146,6 +146,18 @@ export default function SceneManager() {
       onUpdate: (self) => { scrollProgressRef.current = self.progress; },
     });
 
+    // Native scroll fallback for iOS — fires during momentum scroll
+    const handleNativeScroll = () => {
+      const wrapper = document.getElementById("page-wrapper");
+      if (!wrapper) return;
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const docHeight = wrapper.scrollHeight - window.innerHeight;
+      if (docHeight > 0) {
+        scrollProgressRef.current = Math.min(Math.max(scrollTop / docHeight, 0), 1);
+      }
+    };
+    window.addEventListener("scroll", handleNativeScroll, { passive: true });
+
     const handleResize = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
@@ -213,6 +225,7 @@ export default function SceneManager() {
       cancelAnimationFrame(rafRef.current);
       scrollTrigger.kill();
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("scroll", handleNativeScroll);
 
       s.heroBrain?.dispose();
       s.skillsNetwork?.dispose();

@@ -1,9 +1,5 @@
 import { useState, useEffect } from "react";
-import gsap from "gsap";
-import ScrollToPlugin from "gsap/ScrollToPlugin";
 import "./Navbar.css";
-
-gsap.registerPlugin(ScrollToPlugin);
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,7 +19,8 @@ export default function Navbar() {
     e.preventDefault();
     const href = e.currentTarget.getAttribute("href");
     if (href) {
-      gsap.to(window, { duration: 0.8, scrollTo: href, ease: "power2.inOut" });
+      const el = document.querySelector(href);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
     }
     setIsOpen(false);
     document.body.classList.remove("menu-open");
