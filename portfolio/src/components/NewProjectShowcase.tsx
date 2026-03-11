@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import "./NewProjectShowcase.css";
@@ -10,7 +10,7 @@ const projects = [
   {
     title: "CodeMode – Personal Project Showcase",
     link: "https://codemode.onrender.com",
-    image: "/CodeMode.png", // ודא שהתמונה ב-public או בנתיב הנכון
+    image: "/CodeMode.png",
     poetry: `A canvas for code, sleek and bright,\nWhere ideas flow and visions ignite,\nProjects come to life in digital light,\nCodeMode shines with creative might.`,
   },
   {
@@ -35,9 +35,21 @@ const projects = [
 
 
 export default function NewProjectShowcase() {
+  const [isMobile, setIsMobile] = useState(false);
+
   useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) return;
+
+    const triggers: ScrollTrigger[] = [];
     gsap.utils.toArray<SVGCircleElement>(".mask-circle").forEach((circle) => {
-      gsap.to(circle, {
+      const tween = gsap.to(circle, {
         scrollTrigger: {
           trigger: circle.closest(".project-section")!,
           start: "top center",
@@ -46,11 +58,16 @@ export default function NewProjectShowcase() {
         },
         attr: { r: 1000 },
       });
+      if (tween.scrollTrigger) triggers.push(tween.scrollTrigger);
     });
-  }, []);
+
+    return () => {
+      triggers.forEach((t) => t.kill());
+    };
+  }, [isMobile]);
 
   return (
-    <div id="projects-container" className="project-showcase">
+    <div className="project-showcase">
       <section className="intro-section">
         <h1 className="intro-title">Explore My Projects</h1>
       </section>
@@ -71,11 +88,19 @@ export default function NewProjectShowcase() {
             <p className="project-description">{project.poetry}</p>
           </div>
           <div className="project-image-wrapper">
-            <SVGImageMask
-              image={project.image}
-              maskId={`mask${idx}`}
-              filterId={`filter${idx}`}
-            />
+            {isMobile ? (
+              <img
+                src={project.image}
+                alt={project.title}
+                className="project-img-mobile"
+              />
+            ) : (
+              <SVGImageMask
+                image={project.image}
+                maskId={`mask${idx}`}
+                filterId={`filter${idx}`}
+              />
+            )}
           </div>
         </section>
       ))}

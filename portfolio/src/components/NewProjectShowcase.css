@@ -19,10 +19,6 @@ body {
   color: #f1d7ff;
 }
 
-#projects-container {
-  position: relative;
-}
-
 /* INTRO */
 .intro-section {
   padding: 6rem 1rem 4rem;
@@ -104,8 +100,21 @@ body {
   transition: r 0.4s ease;
 }
 
+/* MOBILE IMAGE (replaces SVG mask on small screens) */
+.project-img-mobile {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
+  .intro-section {
+    padding: 3rem 1rem 2rem;
+  }
+
   .intro-title {
     font-size: 2.4rem;
   }
@@ -114,17 +123,28 @@ body {
     font-size: 1.1rem;
   }
 
+  .project-section {
+    padding: 3rem 1rem;
+    min-height: auto;
+  }
+
+  .project-text {
+    margin-bottom: 1.5rem;
+  }
+
   .project-title {
-    font-size: 2rem;
+    font-size: 1.6rem;
   }
 
   .project-description {
-    font-size: 1rem;
+    font-size: 0.95rem;
     padding: 1rem;
   }
 
   .project-image-wrapper {
-    max-height: 40vh;
+    max-height: none;
+    max-width: 100%;
+    border-radius: 12px;
   }
 }
 

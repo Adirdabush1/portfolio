@@ -21,7 +21,7 @@ export default function HomePage() {
 
 
   return (
-    <div id="projects-container" style={{ overflowX: "hidden" }}>
+    <div id="page-wrapper" style={{ overflowX: "hidden" }}>
       <Navbar />
       <div className="homepage-container" id="home">
 
