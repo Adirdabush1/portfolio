@@ -6,7 +6,7 @@
   background: transparent;
   overflow-x: hidden;
   font-family: "Poppins", sans-serif;
-  color: #f1d7ff;
+  color: #e0e0e0;
 }
 
 /* INTRO */
@@ -17,14 +17,14 @@
 
 .intro-title {
   font-size: 3.8rem;
-  color: #bd485b;
+  color: #b0bec5;
   font-family: "Poppins", sans-serif;
   margin: 0;
 }
 
 .intro-sub {
   font-size: 1.5rem;
-  color: #eaddeb;
+  color: #c0c0c0;
   opacity: 0.8;
   margin-top: 1rem;
 }
@@ -51,16 +51,16 @@
 .project-title {
   font-size: 3rem;
   font-family: "Poppins", sans-serif;
-  color: #eb8192;
+  color: #b0bec5;
   margin: 0 0 1rem;
-  mix-blend-mode: color-dodge;
+  mix-blend-mode: normal;
 }
 
 .project-description {
   font-size: 1.2rem;
   line-height: 1.6;
   white-space: pre-line;
-  color: #eaddeb;
+  color: #c0c0c0;
   background-color: rgba(255, 255, 255, 0.03);
   padding: 1.5rem 2rem;
   border-radius: 14px;

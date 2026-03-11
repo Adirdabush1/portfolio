@@ -13,10 +13,13 @@
 .section-header {
   text-align: center;
   margin: 0 auto 40px;
-  font: 300 clamp(32px, 8vw, 60px) 'Poppins', sans-serif;
-  color: #fff;
-  text-transform: uppercase;
-  letter-spacing: 6px;
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(32px, 8vw, 60px);
+  font-weight: 700;
+  font-style: normal;
+  color: #b0bec5;
+  text-transform: none;
+  letter-spacing: 2px;
   max-width: 90vw;
   word-break: break-word;
 }
