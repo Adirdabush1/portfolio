@@ -143,21 +143,26 @@ export default function SceneManager() {
     // Lock scroll during loading
     document.body.style.overflow = "hidden";
 
+    // Normalize scroll for consistent mobile touch behavior
+    ScrollTrigger.normalizeScroll(true);
+
+    const isTouch = "ontouchstart" in window;
     const scrollTrigger = ScrollTrigger.create({
       trigger: "#page-wrapper",
       start: "top top",
       end: "bottom bottom",
-      scrub: 0.3,
+      scrub: isTouch ? 1 : 0.3,
       onUpdate: (self) => { scrollProgressRef.current = self.progress; },
     });
 
     const handleResize = () => {
-      if (isMobile()) return;
       const w = window.innerWidth;
       const h = window.innerHeight;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
+      renderer.setPixelRatio(getPixelRatio());
+      ScrollTrigger.refresh();
     };
     window.addEventListener("resize", handleResize);
 
@@ -214,6 +219,7 @@ export default function SceneManager() {
 
     return () => {
       document.body.style.overflow = "";
+      ScrollTrigger.normalizeScroll(false);
       clearInterval(loadInterval);
       cancelAnimationFrame(rafRef.current);
       scrollTrigger.kill();
