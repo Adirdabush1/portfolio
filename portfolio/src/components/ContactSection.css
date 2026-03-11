@@ -13,7 +13,7 @@
 .section-header {
   text-align: center;
   margin: 0 auto 40px;
-  font: 300 clamp(32px, 8vw, 60px) 'Oswald', sans-serif;
+  font: 300 clamp(32px, 8vw, 60px) 'Poppins', sans-serif;
   color: #fff;
   text-transform: uppercase;
   letter-spacing: 6px;
@@ -40,7 +40,7 @@
   max-width: 400px;
   width: 100%;
   /* מלא רוחב בתוך המיכל */
-  font-family: 'Lato', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-weight: 400;
 }
 
@@ -98,7 +98,7 @@ textarea {
 
 .send-text {
   margin-top: 10px;
-  font: 700 12px 'Lato', sans-serif;
+  font: 700 12px 'Poppins', sans-serif;
   letter-spacing: 2px;
 }
 
@@ -111,7 +111,7 @@ textarea {
   max-width: 400px;
   width: 100%;
   color: #bbb;
-  font-family: 'Lato', sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 
 /* רשימה */
@@ -129,7 +129,7 @@ textarea {
 
 /* טקסטים */
 .contact-text {
-  font: 300 18px 'Lato', sans-serif;
+  font: 300 18px 'Poppins', sans-serif;
   letter-spacing: 1.9px;
   color: #bbb;
   word-wrap: break-word;
@@ -196,7 +196,7 @@ textarea {
 }
 
 .copyright {
-  font: 200 14px 'Oswald', sans-serif;
+  font: 200 14px 'Poppins', sans-serif;
   color: #555;
   letter-spacing: 1px;
   text-align: center;

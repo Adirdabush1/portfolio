@@ -1,12 +1,11 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Elsie+Swash+Caps&display=swap");
+/* Fonts loaded globally via Poppins */
 
 .project-showcase {
   width: 100%;
   min-height: 100vh;
   background: transparent;
   overflow-x: hidden;
-  font-family: "Outfit", sans-serif;
+  font-family: "Poppins", sans-serif;
   color: #f1d7ff;
 }
 
@@ -19,7 +18,7 @@
 .intro-title {
   font-size: 3.8rem;
   color: #bd485b;
-  font-family: "Elsie Swash Caps", serif;
+  font-family: "Poppins", sans-serif;
   margin: 0;
 }
 
@@ -51,7 +50,7 @@
 
 .project-title {
   font-size: 3rem;
-  font-family: "Elsie Swash Caps", serif;
+  font-family: "Poppins", sans-serif;
   color: #eb8192;
   margin: 0 0 1rem;
   mix-blend-mode: color-dodge;

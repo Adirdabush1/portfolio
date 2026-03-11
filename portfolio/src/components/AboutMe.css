@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Teko:wght@600&family=Space+Mono&display=swap');
+/* Fonts loaded globally via Poppins */
 
 :root {
   --spotlight-gradient: linear-gradient(90deg,
@@ -27,7 +27,7 @@
 
 /* כותרת גדולה עם גודל רספונסיבי */
 .spotlight-heading {
-  font-family: 'Teko', sans-serif;
+  font-family: 'Poppins', sans-serif;
   text-transform: uppercase;
   font-size: clamp(4rem, 10vw, 10rem);
   /* משתנה לפי רוחב המסך */

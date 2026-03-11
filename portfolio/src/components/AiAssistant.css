@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto:700');
+/* Fonts loaded globally via Poppins */
 
 #animated-title-container {
   color: #999;
@@ -21,7 +21,7 @@
   height: 45px;
   margin-bottom: 45px;
   display: inline-block;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 
 #flip div:first-child {
