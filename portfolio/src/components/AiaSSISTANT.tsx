@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
-import "./AiAssistant.css"; 
+import "./AiAssistant.css";
+
+const API_BASE = "https://portfolio-backend-og9l.onrender.com";
+
 export default function AiAssistant() {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
+  const [serverReady, setServerReady] = useState(false);
 
   const suggestedQuestions = [
     "Aren't you afraid AI will replace developers like you?",
@@ -19,8 +23,11 @@ export default function AiAssistant() {
     "How did you build your public travel journal project?"
   ];
 
+  // Wake up the server on page load so it's ready when the user asks
   useEffect(() => {
-    setQuestion("");
+    fetch(`${API_BASE}/api/health`)
+      .then(() => setServerReady(true))
+      .catch(() => setServerReady(true));
   }, []);
 
   const askAI = async () => {
@@ -29,7 +36,7 @@ export default function AiAssistant() {
     setAnswer("");
 
     try {
-      const res = await fetch("https://portfolio-backend-og9l.onrender.com/api/ask", {
+      const res = await fetch(`${API_BASE}/api/ask`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question }),
@@ -77,7 +84,12 @@ Whatever you want!
 
       </div>
 
-      <h2 style={{ marginTop: "2rem", marginBottom: "1rem" }}>Ask Adir AI</h2>
+      <h2 style={{ marginTop: "2rem", marginBottom: "0.5rem" }}>Ask Adir AI</h2>
+      {!serverReady && (
+        <p style={{ fontSize: "0.85rem", color: "#888", marginBottom: "0.5rem" }}>
+          Waking up the server... first answer may take a moment.
+        </p>
+      )}
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: "1rem" }}>
         {suggestedQuestions.map((prompt, idx) => (
@@ -131,7 +143,7 @@ Whatever you want!
         }}
         disabled={loading}
       >
-        {loading ? "Loading..." : "Ask"}
+        {loading ? "Thinking..." : "Ask"}
       </button>
 
       {answer && (

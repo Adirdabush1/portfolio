@@ -10,6 +10,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Health check for warm-up pings
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
 // Endpoint ל-AI chat
 app.post("/api/ask", async (req, res) => {
   const { question } = req.body;

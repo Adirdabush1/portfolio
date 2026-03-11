@@ -5,14 +5,12 @@ import Navbar from "./components/Navbar";
 import GlassAudioPlayer from "./components/GlassAudioPlayer";
 import AboutMeSection from "./components/AboutMeSection";
 import AboutMe from "./components/AboutMe";
-import UseScrollAnimation from "./useScrollAnimation";
 import WantToSeeMore from "./components/WantToSeeMore";
 import NewProjectShowcase from "./components/NewProjectShowcase";
 import AiAssistant from "./components/AiaSSISTANT";
 import SkillsSection from "./components/SkillsSection"
 import ContactSection from "./components/ContactSection";
 import "./HomePage.css";
-import PrivacyNotice13 from "./components/PrivacyNotice13";
 
 export default function HomePage() {
   const rotatingTexts = [
@@ -26,7 +24,6 @@ export default function HomePage() {
     <div id="projects-container" style={{ overflowX: "hidden" }}>
       <Navbar />
       <div className="homepage-container" id="home">
-        <UseScrollAnimation />
 
         <svg width="0" height="0" aria-hidden="true" style={{ position: 'absolute' }}>
           <filter id="tear" x="0" y="0" width="100%" height="100%">
@@ -88,7 +85,6 @@ export default function HomePage() {
 
       <section id="contact">
         <ContactSection />
-        <PrivacyNotice13 onConsentChange={(consent) => console.log("Consent changed:", consent)} />
       </section>
     </div>
   );

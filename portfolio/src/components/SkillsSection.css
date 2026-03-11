@@ -91,3 +91,38 @@
 .skills-list li .descr {
   font-size: 0.9rem;
 }
+
+@media (max-width: 768px) {
+  .skills-section h2 {
+    font-size: 2rem;
+  }
+
+  .skills-list {
+    --col-gap: 1rem;
+    width: 95%;
+    padding-inline: 0.5rem;
+  }
+
+  .skills-list li {
+    width: 8em;
+    gap: 0.5rem;
+  }
+
+  .skills-list li .icon {
+    font-size: 2rem;
+  }
+
+  .skills-list li .title {
+    font-size: 1rem;
+  }
+
+  .skills-list li .descr {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .skills-list li {
+    width: 7em;
+  }
+}

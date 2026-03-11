@@ -127,3 +127,15 @@
   --s: 0.8;
   --d: 4;
 }
+
+@media (max-width: 768px) {
+  .sparkle-wrapper {
+    margin-top: 60px;
+  }
+
+  .sparkle-wrapper a {
+    --font-size: 1.2rem;
+    min-width: 220px;
+    padding: 0.8rem;
+  }
+}

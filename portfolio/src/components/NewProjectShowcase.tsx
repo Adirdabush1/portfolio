@@ -1,11 +1,10 @@
 import React, { useEffect } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
-import ScrollSmoother from "gsap/ScrollSmoother";
 import "./NewProjectShowcase.css";
 import SVGImageMask from "./SVGImageMask";
 
-gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
+gsap.registerPlugin(ScrollTrigger);
 
 const projects = [
   {
@@ -37,12 +36,6 @@ const projects = [
 
 export default function NewProjectShowcase() {
   useEffect(() => {
-    ScrollSmoother.create({
-      content: "#projects-container",
-      smooth: 1.2,
-      effects: true,
-    });
-
     gsap.utils.toArray<SVGCircleElement>(".mask-circle").forEach((circle) => {
       gsap.to(circle, {
         scrollTrigger: {

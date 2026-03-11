@@ -40,16 +40,17 @@ html {
 }
 
 .homepage-container {
-  padding: 6rem 15rem 10rem 4rem;
+  padding: 6rem 4rem 10rem 4rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100vw;
+  width: 100%;
+  max-width: 100vw;
 }
 
 @media (max-width: 992px) {
   .homepage-container {
-    padding: 4rem 3rem 6rem 3rem;
+    padding: 4rem 2rem 6rem 2rem;
   }
 }
 
@@ -68,6 +69,7 @@ html {
   flex-wrap: wrap;
   overflow-x: hidden;
   padding-right: 340px;
+  width: 100%;
 }
 
 @media (max-width: 992px) {
@@ -83,6 +85,7 @@ html {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    gap: 1.5rem;
   }
 }
 
@@ -95,10 +98,18 @@ html {
   flex-direction: column;
   gap: 2rem;
   align-items: center;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    margin: 2rem auto 0;
+    gap: 1.5rem;
+  }
 }
 
 .hero-title-inline {
-  font-size: clamp(4rem, 8vw, 7rem);
+  font-size: clamp(2.5rem, 8vw, 7rem);
   font-weight: 900;
   margin: 0;
   padding: 0.5rem;
