@@ -70,11 +70,14 @@ export default function SceneManager() {
   const handleLoadComplete = useCallback(() => {
     // Unlock scroll and reset to top so the hero section doesn't auto-scroll
     document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
     window.scrollTo(0, 0);
     scrollProgressRef.current = 0;
     setLoaded(true);
-    // Refresh ScrollTrigger after loading is done
-    setTimeout(() => ScrollTrigger.refresh(), 100);
+    // Refresh ScrollTrigger after loading — delay more on mobile for layout recalc
+    setTimeout(() => {
+      ScrollTrigger.refresh(true);
+    }, 300);
   }, []);
 
   useEffect(() => {
@@ -142,6 +145,7 @@ export default function SceneManager() {
     // GSAP ScrollTrigger
     // Lock scroll during loading
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
 
     const scrollTrigger = ScrollTrigger.create({
       trigger: "#page-wrapper",
@@ -215,6 +219,7 @@ export default function SceneManager() {
 
     return () => {
       document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
       clearInterval(loadInterval);
       cancelAnimationFrame(rafRef.current);
       scrollTrigger.kill();
