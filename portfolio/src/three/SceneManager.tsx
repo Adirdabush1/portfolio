@@ -143,15 +143,11 @@ export default function SceneManager() {
     // Lock scroll during loading
     document.body.style.overflow = "hidden";
 
-    // Normalize scroll for consistent mobile touch behavior
-    ScrollTrigger.normalizeScroll(true);
-
-    const isTouch = "ontouchstart" in window;
     const scrollTrigger = ScrollTrigger.create({
       trigger: "#page-wrapper",
       start: "top top",
       end: "bottom bottom",
-      scrub: isTouch ? 1 : 0.3,
+      scrub: 0.5,
       onUpdate: (self) => { scrollProgressRef.current = self.progress; },
     });
 
@@ -219,7 +215,6 @@ export default function SceneManager() {
 
     return () => {
       document.body.style.overflow = "";
-      ScrollTrigger.normalizeScroll(false);
       clearInterval(loadInterval);
       cancelAnimationFrame(rafRef.current);
       scrollTrigger.kill();
