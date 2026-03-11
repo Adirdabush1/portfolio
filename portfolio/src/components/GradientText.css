@@ -10,7 +10,7 @@
 
 .animated-gradient-text {
   position: relative;
-  margin: 0 auto;
+  margin: 0;
   display: inline-flex;
   max-width: fit-content;
   flex-direction: row;

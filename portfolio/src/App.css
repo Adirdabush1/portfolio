@@ -1,6 +1,6 @@
 .about-section {
   padding: 5rem 2rem;
-  background-color: #272727;
+  background-color: transparent;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -30,6 +30,6 @@ html {
   padding: 0;
   height: 100%;
   font-family: "Poppins", sans-serif;
-  background: transparent;
+  background: #0a0f0f;
   color: #b0bec5;
 }

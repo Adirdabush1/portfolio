@@ -1,10 +1,4 @@
 /* כללי */
-body {
-  margin: 0;
-  padding: 0 10px 100px;
-  /* קצת padding צדדי למכשירים קטנים */
-  background-color: #000;
-}
 
 /* מיכל כללי */
 #contact {

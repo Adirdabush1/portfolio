@@ -1,19 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Elsie+Swash+Caps&display=swap");
 
-body {
-  margin: 0;
-  padding: 0;
-  background: #0b0a0a;
-  font-family: "Outfit", sans-serif;
-  color: #f1d7ff;
-  overflow-x: hidden;
-}
-
 .project-showcase {
   width: 100%;
   min-height: 100vh;
-  background: #0b0a0a;
+  background: transparent;
   overflow-x: hidden;
   font-family: "Outfit", sans-serif;
   color: #f1d7ff;

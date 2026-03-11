@@ -1,11 +1,9 @@
 import React from "react";
 import GradientText from "./components/GradientText";
-import RotatingText from './components/RotatingText';
 import Navbar from "./components/Navbar";
 import GlassAudioPlayer from "./components/GlassAudioPlayer";
 import AboutMeSection from "./components/AboutMeSection";
 import AboutMe from "./components/AboutMe";
-import WantToSeeMore from "./components/WantToSeeMore";
 import NewProjectShowcase from "./components/NewProjectShowcase";
 import AiAssistant from "./components/AiaSSISTANT";
 import SkillsSection from "./components/SkillsSection"
@@ -13,12 +11,6 @@ import ContactSection from "./components/ContactSection";
 import "./HomePage.css";
 
 export default function HomePage() {
-  const rotatingTexts = [
-  "React · React Native · Node.js · TypeScript",
-  "Building Web & Mobile Apps from Scratch",
-  "Clean Code. Scalable Solutions. Real Impact"
-];
-
 
   return (
     <div id="page-wrapper" style={{ overflowX: "hidden" }}>
@@ -35,7 +27,7 @@ export default function HomePage() {
         </svg>
 
         <div className="hero-content">
-          <div className="hero">
+          <div className="hero-text">
             <GradientText
               className="hero-title-inline"
               animationSpeed={4}
@@ -43,21 +35,13 @@ export default function HomePage() {
             >
               Hey I'm Adir
             </GradientText>
-
-
-            
-
-          
-
+          </div>
           <img
             src="/homepage.jpg"
-            alt="My SVG"
+            alt="Adir"
             className="hero-image puff-in-hor"
           />
-              <RotatingText texts={rotatingTexts} rotationInterval={4000} />
-            <WantToSeeMore />
         </div>
-            </div>
       </div>
 
       <section id="SkillsSection-section">

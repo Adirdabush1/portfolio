@@ -81,12 +81,6 @@ const skills = [
     description: "Problem-solving and data structures.",
   },
   {
-    icon: "fa-solid fa-layer-group",
-    title: "ShadCN UI / Framer Motion",
-    color: "#FF69B4",
-    description: "Modern UI and animation design.",
-  },
-  {
     icon: "fa-brands fa-docker",
     title: "Docker / Docker Compose",
     color: "#228ddfff",
@@ -103,6 +97,48 @@ const skills = [
     title: "Kubernetes",
     color: "#326ce5",
     description: "Container orchestration, scaling, and management.",
+  },
+  {
+    icon: "fa-solid fa-s",
+    title: "Swift",
+    color: "#F05138",
+    description: "Production iOS apps and SDK development.",
+  },
+  {
+    icon: "fa-solid fa-mobile-screen",
+    title: "SwiftUI",
+    color: "#007AFF",
+    description: "Modern declarative UI for iOS 15+.",
+  },
+  {
+    icon: "fa-brands fa-bluetooth",
+    title: "CoreBluetooth",
+    color: "#0082FC",
+    description: "BLE communication with hardware devices.",
+  },
+  {
+    icon: "fa-solid fa-tower-broadcast",
+    title: "CoreNFC",
+    color: "#34C759",
+    description: "NFC tag scanning for electrodes.",
+  },
+  {
+    icon: "fa-solid fa-arrows-spin",
+    title: "RxSwift / RxCocoa",
+    color: "#B7178C",
+    description: "Reactive programming for iOS.",
+  },
+  {
+    icon: "fa-solid fa-sitemap",
+    title: "MVVM",
+    color: "#8E44AD",
+    description: "Architecture & clean code patterns.",
+  },
+  {
+    icon: "fa-solid fa-database",
+    title: "PostgreSQL",
+    color: "#336791",
+    description: "Relational database design and queries.",
   },
 ];
 

@@ -1,14 +1,14 @@
 // src/App.jsx
 import React from "react";
 import HomePage from "./HomePage";
-import UseScrollAnimation from "./useScrollAnimation"; 
+import SceneManager from "./three/SceneManager";
 
 import "./App.css";
 
 export default function App() {
   return (
     <div className="background-wrapper">
-      <UseScrollAnimation />
+      <SceneManager />
       <HomePage />
     </div>
   );

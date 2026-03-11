@@ -1,7 +1,4 @@
-/* גלילה חלקה */
-html {
-  scroll-behavior: smooth;
-}
+/* Smooth scrolling handled by GSAP ScrollTrigger — do NOT use scroll-behavior: smooth */
 
 /* כפתור המבורגר */
 .menu-btn {
@@ -10,10 +7,13 @@ html {
   right: 20px;
   height: 50px;
   width: 50px;
-  background: #fffafa;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 50%;
   font-size: 24px;
-  color: #000;
+  color: #b0bec5;
   cursor: pointer;
   display: flex;
   justify-content: center;
@@ -24,11 +24,11 @@ html {
 }
 
 .menu-btn:hover {
-  background-color: #eee;
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .menu-btn.open {
-  color: #000;
+  color: #b0bec5;
 }
 
 .wrapper {

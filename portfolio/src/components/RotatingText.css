@@ -1,7 +1,7 @@
 .text-rotate {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   text-transform: uppercase;
   font-size: clamp(0.85rem, 1rem + 0.5vw, 1.5rem);
   font-weight: 900;
@@ -9,6 +9,10 @@
   line-height: 1.1;
   color: white;
   padding: 0 0.5rem;
+  /* Fixed height prevents layout shifts that trigger auto-scroll */
+  height: 2.5em;
+  overflow: hidden;
+  position: relative;
 
   -webkit-text-stroke: 2px black;
   text-shadow: 4px 4px black;

@@ -193,7 +193,6 @@ const RotatingText = forwardRef<RotatingTextRef, RotatingTextProps>(
       <motion.span
         className={cn("text-rotate", mainClassName)}
         {...rest}
-        layout
         transition={transition}
       >
        
@@ -201,7 +200,6 @@ const RotatingText = forwardRef<RotatingTextRef, RotatingTextProps>(
           <motion.div
             key={currentTextIndex}
             className="text-rotate-line"
-            layout
             aria-hidden="true"
           >
             {elements.map((wordObj, wordIndex, array) => {
