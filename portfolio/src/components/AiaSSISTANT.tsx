@@ -1,39 +1,117 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import Avatar3D from "./Avatar3D";
 import "./AiAssistant.css";
 
-const API_BASE = "https://portfolio-backend-og9l.onrender.com";
+const API_BASE = window.location.hostname === "localhost"
+  ? "http://localhost:5000"
+  : "https://portfolio-backend-og9l.onrender.com";
 
 export default function AiAssistant() {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
   const [serverReady, setServerReady] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const suggestedQuestions = [
-    "Aren't you afraid AI will replace developers like you?",
-    "What technologies do you use most often in your projects?",
-    "Why should someone hire you as a full stack developer?",
-    "What kind of projects are you most passionate about?",
-    "How can your skills help a business grow?",
-    "What projects are you most proud of?",
-    "Tell me about a challenging project you've completed",
-    "What are your goals as a developer in the next few years?",
-    "What makes you different from other developers?",
-    "Can you explain how your AI assistant works?",
-    "How did you build your public travel journal project?"
+  const quickChips = [
+    "What's your tech stack?",
+    "Tell me about your experience",
+    "What projects have you built?",
+    "Why should I hire you?",
   ];
 
-  // Wake up the server on page load so it's ready when the user asks
   useEffect(() => {
     fetch(`${API_BASE}/api/health`)
       .then(() => setServerReady(true))
       .catch(() => setServerReady(true));
   }, []);
 
+  const playTTS = async (text: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/tts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+
+      if (!res.ok) return;
+
+      // Stream audio via MediaSource for faster playback start
+      const mediaSource = new MediaSource();
+      const url = URL.createObjectURL(mediaSource);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+
+      audio.onplay = () => setSpeaking(true);
+      audio.onended = () => {
+        setSpeaking(false);
+        URL.revokeObjectURL(url);
+      };
+      audio.onerror = () => setSpeaking(false);
+
+      mediaSource.addEventListener("sourceopen", async () => {
+        try {
+          const sourceBuffer = mediaSource.addSourceBuffer("audio/mpeg");
+          const reader = res.body!.getReader();
+
+          const pump = async () => {
+            const { done, value } = await reader.read();
+            if (done) {
+              if (mediaSource.readyState === "open") mediaSource.endOfStream();
+              return;
+            }
+            sourceBuffer.appendBuffer(value);
+            await new Promise<void>((r) => {
+              if (sourceBuffer.updating) {
+                sourceBuffer.addEventListener("updateend", () => r(), { once: true });
+              } else {
+                r();
+              }
+            });
+            await pump();
+          };
+          await pump();
+        } catch {
+          if (mediaSource.readyState === "open") mediaSource.endOfStream();
+        }
+      });
+
+      await audio.play();
+    } catch {
+      // Fallback to non-streaming if MediaSource fails
+      try {
+        const res = await fetch(`${API_BASE}/api/tts`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text }),
+        });
+        if (!res.ok) return;
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const audio = new Audio(blobUrl);
+        audioRef.current = audio;
+        audio.onplay = () => setSpeaking(true);
+        audio.onended = () => { setSpeaking(false); URL.revokeObjectURL(blobUrl); };
+        audio.onerror = () => setSpeaking(false);
+        await audio.play();
+      } catch {
+        setSpeaking(false);
+      }
+    }
+  };
+
   const askAI = async () => {
     if (!question.trim()) return;
     setLoading(true);
     setAnswer("");
+    setSpeaking(false);
+
+    // Stop any playing audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
 
     try {
       const res = await fetch(`${API_BASE}/api/ask`, {
@@ -45,112 +123,68 @@ export default function AiAssistant() {
       if (!res.ok) throw new Error("Server error");
       const data = await res.json();
       setAnswer(data.text);
+      setLoading(false);
+
+      // Play TTS
+      playTTS(data.text);
     } catch (err) {
       if (err instanceof Error) {
         setAnswer("Error: " + err.message);
       } else {
         setAnswer("Unknown error");
       }
-    } finally {
       setLoading(false);
     }
   };
 
+  const isTalking = loading || speaking;
+
   return (
-    <section
-          id="ai-assistant-section"
-
-      style={{
-        padding: "1.5rem",
-        backgroundColor: "#1e1e1e",
-        color: "#eee",
-        borderRadius: "12px",
-        marginTop: "2rem",
-        maxWidth: "800px",
-        marginInline: "auto",
-        textAlign: "center",
-      }}
-    >
-      {/* Animated Title */}
-      <div id="animated-title-container">
-       ask{" "}
-<div id="flip">
-  <div><div>Adir</div></div>
-  <div><div>Agent Smith</div></div>
-  <div><div>The Developer</div></div>
- 
-</div>{" "}
-Whatever you want!
-
+    <section id="ai-assistant-section" className="ai-assistant-section">
+      {/* 3D Avatar */}
+      <div className="ai-avatar-wrapper">
+        <Avatar3D talking={isTalking} />
+        <div className={`ai-status ${isTalking ? "active" : ""}`}>
+          {loading ? "Thinking..." : speaking ? "Speaking..." : !serverReady ? "Waking up server..." : "Ask me anything about Adir"}
+        </div>
       </div>
 
-      <h2 style={{ marginTop: "2rem", marginBottom: "0.5rem" }}>Ask Adir AI</h2>
-      {!serverReady && (
-        <p style={{ fontSize: "0.85rem", color: "#888", marginBottom: "0.5rem" }}>
-          Waking up the server... first answer may take a moment.
-        </p>
+      {/* Speech Bubble for Answer */}
+      {answer && (
+        <div className="speech-bubble">
+          {answer}
+        </div>
       )}
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: "1rem" }}>
-        {suggestedQuestions.map((prompt, idx) => (
+      {/* Input Row */}
+      <div className="ai-input-row">
+        <input
+          type="text"
+          placeholder="Type your question here..."
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") askAI(); }}
+          disabled={loading}
+        />
+        <button onClick={askAI} disabled={loading}>
+          {loading ? "..." : "Ask"}
+        </button>
+      </div>
+
+      {/* Small Suggestion Chips */}
+      <div className="ai-chips">
+        {quickChips.map((chip, idx) => (
           <button
             key={idx}
-            onClick={() => setQuestion(prompt)}
-            style={{
-              padding: "0.4rem 0.8rem",
-              fontSize: "0.9rem",
-              borderRadius: "6px",
-              background: "#333",
-              color: "#fff",
-              border: "1px solid #444",
-              cursor: "pointer"
+            className="ai-chip"
+            onClick={() => {
+              setQuestion(chip);
             }}
           >
-            {prompt}
+            {chip}
           </button>
         ))}
       </div>
-
-      <input
-        type="text"
-        placeholder="Type your question here..."
-        value={question}
-        onChange={(e) => setQuestion(e.target.value)}
-        onKeyDown={(e) => { if (e.key === "Enter") askAI(); }}
-        style={{
-          width: "100%",
-          padding: "0.6rem",
-          fontSize: "1rem",
-          borderRadius: "6px",
-          border: "1px solid #555",
-          backgroundColor: "#2a2a2a",
-          color: "#fff",
-        }}
-        disabled={loading}
-      />
-
-      <button
-        onClick={askAI}
-        style={{
-          marginTop: "0.8rem",
-          padding: "0.6rem 1.2rem",
-          fontSize: "1rem",
-          cursor: "pointer",
-          borderRadius: "6px",
-          backgroundColor: "#0070f3",
-          color: "#fff",
-          border: "none",
-        }}
-        disabled={loading}
-      >
-        {loading ? "Thinking..." : "Ask"}
-      </button>
-
-      {answer && (
-        <p style={{ marginTop: "1rem", whiteSpace: "pre-wrap", lineHeight: "1.6" }}>
-          {answer}
-        </p>
-      )}
     </section>
   );
 }

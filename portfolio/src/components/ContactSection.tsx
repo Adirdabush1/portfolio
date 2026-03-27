@@ -157,7 +157,7 @@ export default function ContactSection() {
 
             <li>
               <a
-                href="https://linkedin.com/in/yourprofile"
+                href="https://il.linkedin.com/in/adir-dabush-11a97b2b9"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="contact-icon"

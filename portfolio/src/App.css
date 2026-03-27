@@ -32,4 +32,9 @@ html {
   font-family: "Poppins", sans-serif;
   background: #0a0f0f;
   color: #b0bec5;
+  scrollbar-width: none;
+}
+
+body::-webkit-scrollbar {
+  display: none;
 }
