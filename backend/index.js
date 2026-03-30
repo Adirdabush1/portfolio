@@ -158,8 +158,10 @@ app.post("/api/tts", async (req, res) => {
     res.set({ "Content-Type": "audio/mpeg", "Content-Length": ttsRes.data.length });
     res.send(Buffer.from(ttsRes.data));
   } catch (err) {
-    console.error("TTS Error:", err.response?.data?.toString() || err.message);
-    res.status(500).json({ error: "TTS failed" });
+    const detail = err.response?.data ? Buffer.from(err.response.data).toString() : err.message;
+    console.error("TTS Error:", err.response?.status, detail);
+    console.error("API Key present:", !!process.env.ELEVENLABS_API_KEY);
+    res.status(500).json({ error: "TTS failed", detail });
   }
 });
 
