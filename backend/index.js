@@ -136,10 +136,10 @@ app.post("/api/tts", async (req, res) => {
 
   try {
     const ttsRes = await axios.post(
-      "https://api.elevenlabs.io/v1/text-to-speech/iP95p4xoKVk53GoZ742B/stream",
+      "https://api.elevenlabs.io/v1/text-to-speech/iP95p4xoKVk53GoZ742B",
       {
         text,
-        model_id: "eleven_turbo_v2_5",
+        model_id: "eleven_multilingual_v2",
         voice_settings: {
           stability: 0.5,
           similarity_boost: 0.75,
@@ -151,12 +151,12 @@ app.post("/api/tts", async (req, res) => {
           "Content-Type": "application/json",
           Accept: "audio/mpeg",
         },
-        responseType: "stream",
+        responseType: "arraybuffer",
       }
     );
 
-    res.set({ "Content-Type": "audio/mpeg", "Transfer-Encoding": "chunked" });
-    ttsRes.data.pipe(res);
+    res.set({ "Content-Type": "audio/mpeg", "Content-Length": ttsRes.data.length });
+    res.send(Buffer.from(ttsRes.data));
   } catch (err) {
     console.error("TTS Error:", err.response?.data?.toString() || err.message);
     res.status(500).json({ error: "TTS failed" });
