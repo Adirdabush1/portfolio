@@ -16,7 +16,7 @@ export default function AiAssistant() {
   const [speaking, setSpeaking] = useState(false);
   const [listening, setListening] = useState(false);
   const [serverReady, setServerReady] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const recognitionRef = useRef<any>(null);
 
   const quickChips = [
@@ -32,91 +32,44 @@ export default function AiAssistant() {
       .catch(() => setServerReady(true));
   }, []);
 
-  const playTTS = async (text: string) => {
-    try {
-      const res = await fetch(`${API_BASE}/api/tts`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      });
+  const speakText = (text: string) => {
+    if (!window.speechSynthesis) return;
 
-      if (!res.ok) return;
+    window.speechSynthesis.cancel();
 
-      // Stream audio via MediaSource for faster playback start
-      const mediaSource = new MediaSource();
-      const url = URL.createObjectURL(mediaSource);
-      const audio = new Audio(url);
-      audioRef.current = audio;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1;
+    utterance.pitch = 1;
 
-      audio.onplay = () => setSpeaking(true);
-      audio.onended = () => {
-        setSpeaking(false);
-        URL.revokeObjectURL(url);
-      };
-      audio.onerror = () => setSpeaking(false);
+    // Try to pick a good English voice
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = voices.find(
+      (v) => v.lang.startsWith("en") && v.name.includes("Google")
+    ) || voices.find(
+      (v) => v.lang.startsWith("en") && v.name.includes("Daniel")
+    ) || voices.find(
+      (v) => v.lang.startsWith("en-US")
+    );
+    if (preferred) utterance.voice = preferred;
 
-      mediaSource.addEventListener("sourceopen", async () => {
-        try {
-          const sourceBuffer = mediaSource.addSourceBuffer("audio/mpeg");
-          const reader = res.body!.getReader();
+    utterance.onstart = () => setSpeaking(true);
+    utterance.onend = () => setSpeaking(false);
+    utterance.onerror = () => setSpeaking(false);
 
-          const pump = async () => {
-            const { done, value } = await reader.read();
-            if (done) {
-              if (mediaSource.readyState === "open") mediaSource.endOfStream();
-              return;
-            }
-            sourceBuffer.appendBuffer(value);
-            await new Promise<void>((r) => {
-              if (sourceBuffer.updating) {
-                sourceBuffer.addEventListener("updateend", () => r(), { once: true });
-              } else {
-                r();
-              }
-            });
-            await pump();
-          };
-          await pump();
-        } catch {
-          if (mediaSource.readyState === "open") mediaSource.endOfStream();
-        }
-      });
+    utteranceRef.current = utterance;
+    window.speechSynthesis.speak(utterance);
+  };
 
-      await audio.play();
-    } catch {
-      // Fallback to non-streaming if MediaSource fails
-      try {
-        const res = await fetch(`${API_BASE}/api/tts`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text }),
-        });
-        if (!res.ok) return;
-        const blob = await res.blob();
-        const blobUrl = URL.createObjectURL(blob);
-        const audio = new Audio(blobUrl);
-        audioRef.current = audio;
-        audio.onplay = () => setSpeaking(true);
-        audio.onended = () => { setSpeaking(false); URL.revokeObjectURL(blobUrl); };
-        audio.onerror = () => setSpeaking(false);
-        await audio.play();
-      } catch {
-        setSpeaking(false);
-      }
-    }
+  const stopSpeaking = () => {
+    window.speechSynthesis.cancel();
+    setSpeaking(false);
   };
 
   const askAI = async () => {
     if (!question.trim()) return;
     setLoading(true);
     setAnswer("");
-    setSpeaking(false);
-
-    // Stop any playing audio
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
+    stopSpeaking();
 
     try {
       const res = await fetch(`${API_BASE}/api/ask`, {
@@ -129,9 +82,7 @@ export default function AiAssistant() {
       const data = await res.json();
       setAnswer(data.text);
       setLoading(false);
-
-      // Play TTS
-      playTTS(data.text);
+      speakText(data.text);
     } catch (err) {
       if (err instanceof Error) {
         setAnswer("Error: " + err.message);
@@ -145,11 +96,8 @@ export default function AiAssistant() {
   const askWithText = async (text: string) => {
     setLoading(true);
     setAnswer("");
-    setSpeaking(false);
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
+    stopSpeaking();
+
     try {
       const res = await fetch(`${API_BASE}/api/ask`, {
         method: "POST",
@@ -160,7 +108,7 @@ export default function AiAssistant() {
       const data = await res.json();
       setAnswer(data.text);
       setLoading(false);
-      playTTS(data.text);
+      speakText(data.text);
     } catch (err) {
       setAnswer(err instanceof Error ? "Error: " + err.message : "Unknown error");
       setLoading(false);
