@@ -44,6 +44,10 @@ export default function HomePage() {
         </div>
       </div>
 
+      <section id="ai-assistant">
+        <AiAssistant />
+      </section>
+
       <section id="SkillsSection-section">
         <SkillsSection></SkillsSection>
       </section>
@@ -61,10 +65,6 @@ export default function HomePage() {
 
       <section id="projects">
         <NewProjectShowcase />
-      </section>
-
-      <section id="ai-assistant">
-        <AiAssistant />
       </section>
 
       <section id="contact">

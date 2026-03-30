@@ -1,0 +1,13 @@
+.ask-page {
+  min-height: 100vh;
+  background: #0a0f0f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ask-page .ai-assistant-section {
+  min-height: auto;
+  margin: 0;
+  padding: 2rem 1.5rem;
+}

@@ -31,9 +31,8 @@
   text-transform: uppercase;
   font-size: clamp(4rem, 10vw, 10rem);
   /* משתנה לפי רוחב המסך */
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: block;
+  text-align: center;
   margin: 0 auto 2rem;
   position: relative;
   background: transparent;

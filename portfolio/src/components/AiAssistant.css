@@ -3,13 +3,18 @@
 /* ===== Section ===== */
 .ai-assistant-section {
   padding: 2rem 1.5rem;
+  padding-top: 0;
   background-color: transparent;
   color: #eee;
   border-radius: 12px;
-  margin-top: 2rem;
+  margin: -60vh auto 20vh;
   max-width: 800px;
-  margin-inline: auto;
   text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
 }
 
 /* ===== Animated Title ===== */
@@ -261,6 +266,39 @@
 .ai-input-row button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* ===== Mic Button ===== */
+.ai-mic-btn {
+  padding: 0.7rem;
+  width: 45px;
+  height: 45px;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ai-mic-btn:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.ai-mic-btn.listening {
+  background-color: #e53935;
+  border-color: #e53935;
+  animation: mic-pulse 1s infinite;
+}
+
+@keyframes mic-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(229, 57, 53, 0); }
 }
 
 /* ===== Suggested chips ===== */
