@@ -84,8 +84,17 @@ export default function AiAssistant() {
     setSpeaking(false);
   };
 
+  // Unlock audio on iOS by speaking empty utterance on user tap
+  const unlockAudio = () => {
+    if (!window.speechSynthesis) return;
+    const silence = new SpeechSynthesisUtterance("");
+    silence.volume = 0;
+    window.speechSynthesis.speak(silence);
+  };
+
   const askAI = async () => {
     if (!question.trim()) return;
+    unlockAudio();
     setLoading(true);
     setAnswer("");
     stopSpeaking();
@@ -113,6 +122,7 @@ export default function AiAssistant() {
   };
 
   const askWithText = async (text: string) => {
+    unlockAudio();
     setLoading(true);
     setAnswer("");
     stopSpeaking();
