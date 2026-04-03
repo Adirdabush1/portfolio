@@ -1,7 +1,6 @@
 import React from "react";
 import GradientText from "./components/GradientText";
 import Navbar from "./components/Navbar";
-import GlassAudioPlayer from "./components/GlassAudioPlayer";
 import AboutMeSection from "./components/AboutMeSection";
 import AboutMe from "./components/AboutMe";
 import NewProjectShowcase from "./components/NewProjectShowcase";
@@ -55,9 +54,6 @@ export default function HomePage() {
         <AboutMeSection />
       </section>
 
-      <section id="audio-player">
-        <GlassAudioPlayer />
-      </section>
 
       <section id="about-details">
         <AboutMe />

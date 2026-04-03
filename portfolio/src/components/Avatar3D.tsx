@@ -1,348 +1,200 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment } from "@react-three/drei";
+import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import "./Avatar3D.css";
 
-interface RobotProps {
+// Map characters to ARKit morph target combinations
+const VISEME_CHARS: Record<string, Record<string, number>> = {
+  a: { jawOpen: 0.45, mouthLowerDownLeft: 0.2, mouthLowerDownRight: 0.2 },
+  e: { jawOpen: 0.25, mouthSmileLeft: 0.3, mouthSmileRight: 0.3, mouthLowerDownLeft: 0.1, mouthLowerDownRight: 0.1 },
+  i: { jawOpen: 0.2, mouthSmileLeft: 0.35, mouthSmileRight: 0.35 },
+  o: { jawOpen: 0.35, mouthFunnel: 0.4, mouthPucker: 0.15 },
+  u: { jawOpen: 0.2, mouthPucker: 0.45, mouthFunnel: 0.25 },
+  b: { jawOpen: 0.05, mouthPressLeft: 0.4, mouthPressRight: 0.4 },
+  m: { jawOpen: 0.02, mouthPressLeft: 0.35, mouthPressRight: 0.35 },
+  p: { jawOpen: 0.05, mouthPressLeft: 0.45, mouthPressRight: 0.45 },
+  f: { jawOpen: 0.1, mouthLowerDownLeft: 0.15, mouthLowerDownRight: 0.15, mouthUpperUpLeft: 0.1, mouthUpperUpRight: 0.1 },
+  v: { jawOpen: 0.1, mouthLowerDownLeft: 0.15, mouthLowerDownRight: 0.15 },
+  t: { jawOpen: 0.15, mouthLowerDownLeft: 0.1, mouthLowerDownRight: 0.1 },
+  d: { jawOpen: 0.18, mouthLowerDownLeft: 0.1, mouthLowerDownRight: 0.1 },
+  s: { jawOpen: 0.1, mouthSmileLeft: 0.15, mouthSmileRight: 0.15, mouthStretchLeft: 0.1, mouthStretchRight: 0.1 },
+  z: { jawOpen: 0.12, mouthSmileLeft: 0.15, mouthSmileRight: 0.15 },
+  n: { jawOpen: 0.15, mouthLowerDownLeft: 0.05, mouthLowerDownRight: 0.05 },
+  l: { jawOpen: 0.2, mouthLowerDownLeft: 0.1, mouthLowerDownRight: 0.1 },
+  r: { jawOpen: 0.2, mouthFunnel: 0.1 },
+  k: { jawOpen: 0.2, mouthLowerDownLeft: 0.1, mouthLowerDownRight: 0.1 },
+  g: { jawOpen: 0.22, mouthLowerDownLeft: 0.1, mouthLowerDownRight: 0.1 },
+  w: { jawOpen: 0.15, mouthPucker: 0.35, mouthFunnel: 0.2 },
+  y: { jawOpen: 0.18, mouthSmileLeft: 0.2, mouthSmileRight: 0.2 },
+  h: { jawOpen: 0.25, mouthLowerDownLeft: 0.1, mouthLowerDownRight: 0.1 },
+  th: { jawOpen: 0.12, mouthLowerDownLeft: 0.15, mouthLowerDownRight: 0.15 },
+  ch: { jawOpen: 0.15, mouthFunnel: 0.2, mouthSmileLeft: 0.1, mouthSmileRight: 0.1 },
+  sh: { jawOpen: 0.12, mouthFunnel: 0.25, mouthPucker: 0.1 },
+  " ": {},
+};
+
+const MOUTH_CLOSED: Record<string, number> = {};
+const BLINK_INTERVAL = 4;
+const BLINK_DURATION = 0.15;
+const CHAR_DURATION = 3.0;
+const LERP_SPEED = 0.08; // How fast morphs transition (lower = smoother/slower)
+
+interface AvatarModelProps {
   talking: boolean;
+  spokenText: string;
 }
 
-function Robot({ talking }: RobotProps) {
-  const groupRef = useRef<THREE.Group>(null);
-  const eyeLeftRef = useRef<THREE.Mesh>(null);
-  const eyeRightRef = useRef<THREE.Mesh>(null);
-  const mouthRef = useRef<THREE.Group>(null);
-  const jawRef = useRef<THREE.Mesh>(null);
-  const antennaLightRef = useRef<THREE.Mesh>(null);
-  const innerGlowRef = useRef<THREE.Mesh>(null);
+function AvatarModel({ talking, spokenText }: AvatarModelProps) {
+  const { scene } = useGLTF("/avatar.glb");
+  const meshRef = useRef<THREE.Mesh | null>(null);
+  const morphDict = useRef<Record<string, number>>({});
+  const visemeQueue = useRef<Record<string, number>[]>([]);
+  const visemeStartTime = useRef(0);
+  const targetViseme = useRef<Record<string, number>>({});
+  const prevText = useRef("");
+  const activeMorphs = useRef(new Set<string>());
 
-  useFrame((state) => {
-    const t = state.clock.elapsedTime;
+  useEffect(() => {
+    scene.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        if (mesh.morphTargetDictionary) {
+          meshRef.current = mesh;
+          morphDict.current = mesh.morphTargetDictionary;
+          mesh.morphTargetInfluences = mesh.morphTargetInfluences ||
+            new Array(Object.keys(mesh.morphTargetDictionary).length).fill(0);
+        }
+      }
+    });
+  }, [scene]);
 
-    // Idle float + rotation
-    if (groupRef.current) {
-      groupRef.current.position.y = Math.sin(t * 0.8) * 0.05;
-      groupRef.current.rotation.y = talking
-        ? Math.sin(t * 1.5) * 0.12
-        : Math.sin(t * 0.3) * 0.15;
-      groupRef.current.rotation.x = talking
-        ? Math.sin(t * 2.5) * 0.05
-        : Math.sin(t * 0.2) * 0.02;
-    }
+  // Build viseme queue when text changes
+  useEffect(() => {
+    if (!spokenText || spokenText === prevText.current) return;
+    prevText.current = spokenText;
 
-    // Eye glow pulse
-    if (eyeLeftRef.current && eyeRightRef.current) {
-      const intensity = talking
-        ? 2 + Math.sin(t * 6) * 1.5
-        : 1.2 + Math.sin(t * 1.5) * 0.3;
-      (eyeLeftRef.current.material as THREE.MeshStandardMaterial).emissiveIntensity = intensity;
-      (eyeRightRef.current.material as THREE.MeshStandardMaterial).emissiveIntensity = intensity;
+    const text = spokenText.toLowerCase().replace(/[^a-z\s]/g, "");
+    const queue: Record<string, number>[] = [];
 
-      // Blink
-      const blinkCycle = t % 5;
-      const blinkScale = blinkCycle > 4.8 && blinkCycle < 4.9 ? 0.1 : 1;
-      eyeLeftRef.current.scale.y = blinkScale;
-      eyeRightRef.current.scale.y = blinkScale;
-    }
-
-    // Mouth animation - jaw opens/closes
-    if (jawRef.current) {
-      if (talking) {
-        const jawOpen = Math.abs(Math.sin(t * 7)) * 0.15;
-        jawRef.current.rotation.x = jawOpen * 0.3;
-        jawRef.current.position.y = -0.18 - jawOpen;
+    for (let i = 0; i < text.length; i++) {
+      const digraph = text.substring(i, i + 2);
+      if (VISEME_CHARS[digraph]) {
+        queue.push(VISEME_CHARS[digraph]);
+        i++;
+      } else if (VISEME_CHARS[text[i]]) {
+        queue.push(VISEME_CHARS[text[i]]);
       } else {
-        jawRef.current.rotation.x = 0;
-        jawRef.current.position.y = -0.18;
+        queue.push(MOUTH_CLOSED);
       }
     }
 
-    // Mouth glow bars
-    if (mouthRef.current) {
-      mouthRef.current.children.forEach((bar, i) => {
-        if (talking) {
-          const scale = 0.3 + Math.abs(Math.sin(t * 8 + i * 1.2)) * 0.7;
-          bar.scale.y = scale;
-        } else {
-          bar.scale.y = 0.3;
+    visemeQueue.current = queue;
+    visemeStartTime.current = 0;
+  }, [spokenText]);
+
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
+    const mesh = meshRef.current;
+    const dict = morphDict.current;
+    if (!mesh || !mesh.morphTargetInfluences) return;
+
+    // Idle movement
+    scene.rotation.y = Math.sin(t * 0.3) * 0.03;
+    scene.rotation.x = Math.sin(t * 0.2) * 0.01;
+    scene.position.y = Math.sin(t * 0.8) * 0.005;
+
+    // Blink
+    const blinkCycle = t % BLINK_INTERVAL;
+    const isBlinking = blinkCycle > (BLINK_INTERVAL - BLINK_DURATION);
+    if (dict.eyeBlinkLeft !== undefined) {
+      mesh.morphTargetInfluences[dict.eyeBlinkLeft] = isBlinking ? 1 : 0;
+    }
+    if (dict.eyeBlinkRight !== undefined) {
+      mesh.morphTargetInfluences[dict.eyeBlinkRight] = isBlinking ? 1 : 0;
+    }
+
+    // Text-based lip sync
+    if (talking && visemeQueue.current.length > 0) {
+      if (visemeStartTime.current === 0) {
+        visemeStartTime.current = t;
+      }
+
+      const elapsed = t - visemeStartTime.current;
+      const charIndex = Math.floor(elapsed / CHAR_DURATION);
+
+      if (charIndex < visemeQueue.current.length) {
+        targetViseme.current = visemeQueue.current[charIndex];
+      } else {
+        // Text finished - close mouth, don't loop
+        targetViseme.current = MOUTH_CLOSED;
+      }
+
+      const target = targetViseme.current;
+
+      // Reset active morphs toward 0
+      for (const name of activeMorphs.current) {
+        if (dict[name] !== undefined) {
+          const current = mesh.morphTargetInfluences[dict[name]];
+          const goal = target[name] || 0;
+          mesh.morphTargetInfluences[dict[name]] = current + (goal - current) * LERP_SPEED;
         }
-      });
-    }
+      }
 
-    // Antenna light
-    if (antennaLightRef.current) {
-      const glow = talking ? 3 + Math.sin(t * 4) * 2 : 1 + Math.sin(t * 1) * 0.5;
-      (antennaLightRef.current.material as THREE.MeshStandardMaterial).emissiveIntensity = glow;
-    }
+      // Apply target morphs
+      for (const name of Object.keys(target)) {
+        const weight = target[name];
+        if (dict[name] !== undefined) {
+          activeMorphs.current.add(name);
+          const current = mesh.morphTargetInfluences[dict[name]];
+          mesh.morphTargetInfluences[dict[name]] = current + (weight - current) * LERP_SPEED;
+        }
+      }
 
-    // Inner glow
-    if (innerGlowRef.current) {
-      const opacity = talking ? 0.15 + Math.sin(t * 3) * 0.1 : 0.05;
-      (innerGlowRef.current.material as THREE.MeshStandardMaterial).opacity = opacity;
+      // Subtle talking movement
+      scene.rotation.y = Math.sin(t * 1.2) * 0.04;
+      scene.rotation.x = Math.sin(t * 2) * 0.015;
+    } else {
+      // Ease all mouth morphs to 0
+      for (const name of activeMorphs.current) {
+        if (dict[name] !== undefined) {
+          const current = mesh.morphTargetInfluences[dict[name]];
+          mesh.morphTargetInfluences[dict[name]] = current * 0.85;
+          if (current < 0.001) {
+            mesh.morphTargetInfluences[dict[name]] = 0;
+          }
+        }
+      }
+      if (!talking && visemeStartTime.current !== 0) {
+        visemeStartTime.current = 0;
+      }
     }
   });
 
-  const metalMat = {
-    color: "#7a8aa5",
-    metalness: 0.9,
-    roughness: 0.15,
-  };
+  useEffect(() => {
+    const cube = scene.getObjectByName("Cube");
+    if (cube) cube.visible = false;
+  }, [scene]);
 
-  const darkMetalMat = {
-    color: "#5a6a85",
-    metalness: 0.95,
-    roughness: 0.1,
-  };
-
-  const accentColor = "#00b4ff";
-
-  return (
-    <group ref={groupRef}>
-      {/* === HEAD === */}
-      {/* Main head - rounded box shape */}
-      <mesh position={[0, 0.1, 0]}>
-        <sphereGeometry args={[0.62, 64, 64]} />
-        <meshStandardMaterial {...metalMat} />
-      </mesh>
-
-      {/* Head top plate */}
-      <mesh position={[0, 0.55, 0]} scale={[0.75, 0.12, 0.75]}>
-        <cylinderGeometry args={[0.45, 0.5, 1, 32]} />
-        <meshStandardMaterial {...darkMetalMat} />
-      </mesh>
-
-      {/* Inner glow sphere */}
-      <mesh ref={innerGlowRef} position={[0, 0.1, 0]}>
-        <sphereGeometry args={[0.58, 32, 32]} />
-        <meshStandardMaterial
-          color={accentColor}
-          emissive={accentColor}
-          emissiveIntensity={1}
-          transparent
-          opacity={0.05}
-          side={THREE.FrontSide}
-        />
-      </mesh>
-
-      {/* Face plate / visor */}
-      <mesh position={[0, 0.15, 0.45]} scale={[1.05, 0.65, 0.3]}>
-        <sphereGeometry args={[0.45, 32, 32]} />
-        <meshStandardMaterial
-          color="#2a3050"
-          metalness={0.3}
-          roughness={0.05}
-          transparent
-          opacity={0.85}
-        />
-      </mesh>
-
-      {/* === EYES === */}
-      {/* Left eye */}
-      <mesh ref={eyeLeftRef} position={[-0.18, 0.2, 0.55]}>
-        <sphereGeometry args={[0.075, 32, 32]} />
-        <meshStandardMaterial
-          color={accentColor}
-          emissive={accentColor}
-          emissiveIntensity={1.2}
-        />
-      </mesh>
-      {/* Left eye outer ring */}
-      <mesh position={[-0.18, 0.2, 0.53]} rotation={[0, 0, 0]}>
-        <torusGeometry args={[0.1, 0.015, 16, 32]} />
-        <meshStandardMaterial
-          color={accentColor}
-          emissive={accentColor}
-          emissiveIntensity={0.5}
-        />
-      </mesh>
-
-      {/* Right eye */}
-      <mesh ref={eyeRightRef} position={[0.18, 0.2, 0.55]}>
-        <sphereGeometry args={[0.075, 32, 32]} />
-        <meshStandardMaterial
-          color={accentColor}
-          emissive={accentColor}
-          emissiveIntensity={1.2}
-        />
-      </mesh>
-      {/* Right eye outer ring */}
-      <mesh position={[0.18, 0.2, 0.53]} rotation={[0, 0, 0]}>
-        <torusGeometry args={[0.1, 0.015, 16, 32]} />
-        <meshStandardMaterial
-          color={accentColor}
-          emissive={accentColor}
-          emissiveIntensity={0.5}
-        />
-      </mesh>
-
-      {/* === MOUTH === */}
-      {/* Upper lip plate */}
-      <mesh position={[0, -0.1, 0.62]}>
-        <boxGeometry args={[0.3, 0.05, 0.1]} />
-        <meshStandardMaterial color="#4a5570" metalness={0.9} roughness={0.1} />
-      </mesh>
-      {/* Upper lip edge - glowing accent */}
-      <mesh position={[0, -0.125, 0.68]}>
-        <boxGeometry args={[0.28, 0.02, 0.02]} />
-        <meshStandardMaterial
-          color={accentColor}
-          emissive={accentColor}
-          emissiveIntensity={1.5}
-        />
-      </mesh>
-
-      {/* Jaw - moves when talking */}
-      <mesh ref={jawRef} position={[0, -0.18, 0.62]}>
-        <boxGeometry args={[0.28, 0.05, 0.1]} />
-        <meshStandardMaterial color="#4a5570" metalness={0.9} roughness={0.1} />
-      </mesh>
-      {/* Lower lip edge - glowing accent (child of jaw so it moves with it) */}
-      <mesh position={[0, -0.155, 0.68]}>
-        <boxGeometry args={[0.24, 0.02, 0.02]} />
-        <meshStandardMaterial
-          color={accentColor}
-          emissive={accentColor}
-          emissiveIntensity={1.5}
-        />
-      </mesh>
-
-      {/* Mouth interior glow (visible between lip and jaw) */}
-      <mesh position={[0, -0.14, 0.64]}>
-        <boxGeometry args={[0.24, 0.06, 0.06]} />
-        <meshStandardMaterial
-          color={accentColor}
-          emissive={accentColor}
-          emissiveIntensity={1}
-        />
-      </mesh>
-
-      {/* Equalizer bars inside mouth */}
-      <group ref={mouthRef} position={[0, -0.14, 0.68]}>
-        {[-0.08, -0.04, 0, 0.04, 0.08].map((x, i) => (
-          <mesh key={i} position={[x, 0, 0]}>
-            <boxGeometry args={[0.025, 0.05, 0.015]} />
-            <meshStandardMaterial
-              color={accentColor}
-              emissive={accentColor}
-              emissiveIntensity={1.2}
-            />
-          </mesh>
-        ))}
-      </group>
-
-      {/* === ANTENNA === */}
-      <mesh position={[0, 0.72, 0]}>
-        <cylinderGeometry args={[0.015, 0.015, 0.2, 8]} />
-        <meshStandardMaterial {...darkMetalMat} />
-      </mesh>
-      {/* Antenna light */}
-      <mesh ref={antennaLightRef} position={[0, 0.84, 0]}>
-        <sphereGeometry args={[0.04, 16, 16]} />
-        <meshStandardMaterial
-          color={accentColor}
-          emissive={accentColor}
-          emissiveIntensity={1}
-        />
-      </mesh>
-
-      {/* === SIDE PANELS === */}
-      {/* Left ear panel */}
-      <mesh position={[-0.58, 0.15, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.1, 0.1, 0.08, 6]} />
-        <meshStandardMaterial {...darkMetalMat} />
-      </mesh>
-      <mesh position={[-0.63, 0.15, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.06, 0.06, 0.02, 16]} />
-        <meshStandardMaterial
-          color={accentColor}
-          emissive={accentColor}
-          emissiveIntensity={0.4}
-        />
-      </mesh>
-
-      {/* Right ear panel */}
-      <mesh position={[0.58, 0.15, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.1, 0.1, 0.08, 6]} />
-        <meshStandardMaterial {...darkMetalMat} />
-      </mesh>
-      <mesh position={[0.63, 0.15, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.06, 0.06, 0.02, 16]} />
-        <meshStandardMaterial
-          color={accentColor}
-          emissive={accentColor}
-          emissiveIntensity={0.4}
-        />
-      </mesh>
-
-      {/* === NECK === */}
-      <mesh position={[0, -0.45, 0]}>
-        <cylinderGeometry args={[0.12, 0.18, 0.2, 16]} />
-        <meshStandardMaterial {...darkMetalMat} />
-      </mesh>
-      {/* Neck ring */}
-      <mesh position={[0, -0.38, 0]}>
-        <torusGeometry args={[0.15, 0.02, 8, 32]} />
-        <meshStandardMaterial
-          color={accentColor}
-          emissive={accentColor}
-          emissiveIntensity={0.3}
-        />
-      </mesh>
-
-      {/* === SHOULDERS === */}
-      <mesh position={[0, -0.65, 0]}>
-        <boxGeometry args={[0.9, 0.2, 0.45]} />
-        <meshStandardMaterial {...metalMat} />
-      </mesh>
-      {/* Shoulder accent line */}
-      <mesh position={[0, -0.56, 0.23]}>
-        <boxGeometry args={[0.85, 0.015, 0.01]} />
-        <meshStandardMaterial
-          color={accentColor}
-          emissive={accentColor}
-          emissiveIntensity={0.5}
-        />
-      </mesh>
-
-      {/* Chest plate detail */}
-      <mesh position={[0, -0.72, 0.2]}>
-        <circleGeometry args={[0.08, 32]} />
-        <meshStandardMaterial
-          color={accentColor}
-          emissive={accentColor}
-          emissiveIntensity={0.6}
-          transparent
-          opacity={0.8}
-        />
-      </mesh>
-    </group>
-  );
+  return <primitive object={scene} scale={0.55} position={[0, -0.5, 0]} />;
 }
+
+useGLTF.preload("/avatar.glb");
 
 interface Avatar3DProps {
   talking: boolean;
+  spokenText?: string;
 }
 
-export default function Avatar3D({ talking }: Avatar3DProps) {
+export default function Avatar3D({ talking, spokenText = "" }: Avatar3DProps) {
   return (
     <div className={`avatar-3d-container ${talking ? "talking" : ""}`}>
       <Canvas
-        camera={{ position: [0, 0, 2.8], fov: 35 }}
+        camera={{ position: [0, 0, 3], fov: 35 }}
         style={{ background: "transparent" }}
       >
-        <ambientLight intensity={0.3} />
-        <directionalLight position={[3, 4, 5]} intensity={0.7} />
-        <directionalLight position={[-3, 2, 3]} intensity={0.3} color="#4060ff" />
-        <pointLight position={[0, 0, 3]} intensity={0.5} color="#00b4ff" />
-        <Environment preset="city" />
-        <Robot talking={talking} />
-        <OrbitControls
-          enableZoom={false}
-          enablePan={false}
-          minPolarAngle={Math.PI / 2.5}
-          maxPolarAngle={Math.PI / 1.8}
-        />
+        <ambientLight intensity={0.0} />
+        <AvatarModel talking={talking} spokenText={spokenText} />
       </Canvas>
     </div>
   );

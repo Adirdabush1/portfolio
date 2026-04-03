@@ -74,7 +74,23 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 1.5rem 0;
+  justify-content: center;
+  margin: 1.5rem auto;
+  position: relative;
+}
+
+.ai-avatar-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #0a1628 0%, #060d1a 60%, #020408 100%);
+  z-index: 0;
+  pointer-events: none;
 }
 
 .ai-avatar {
@@ -261,6 +277,13 @@
 
 .ai-input-row button:hover:not(:disabled) {
   background-color: #005bc4;
+}
+
+.ai-stop-btn {
+  background-color: #e53935 !important;
+}
+.ai-stop-btn:hover {
+  background-color: #c62828 !important;
 }
 
 .ai-input-row button:disabled {

@@ -16,9 +16,7 @@ export default function AiAssistant() {
   const [speaking, setSpeaking] = useState(false);
   const [listening, setListening] = useState(false);
   const [serverReady, setServerReady] = useState(false);
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const recognitionRef = useRef<any>(null);
-  const fakeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const quickChips = [
     "What's your tech stack?",
@@ -34,13 +32,16 @@ export default function AiAssistant() {
 
     // Preload voices (Chrome loads them async)
     window.speechSynthesis?.getVoices();
-    window.speechSynthesis?.addEventListener?.("voiceschanged", () => {
-      window.speechSynthesis.getVoices();
-    });
+    const onVoicesChanged = () => window.speechSynthesis.getVoices();
+    window.speechSynthesis?.addEventListener?.("voiceschanged", onVoicesChanged);
+    return () => {
+      window.speechSynthesis?.removeEventListener?.("voiceschanged", onVoicesChanged);
+    };
   }, []);
 
-  const speakText = (rawText: string) => {
-    // Clean markdown/symbols for natural speech
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const speakText = async (rawText: string) => {
     const text = rawText
       .replace(/\*\*/g, "")
       .replace(/\*/g, "")
@@ -51,62 +52,56 @@ export default function AiAssistant() {
       .replace(/\.{2,}/g, ".")
       .trim();
 
-    // Start fake lip-sync immediately as fallback
-    const duration = Math.max(text.length * 50, 2000);
     setSpeaking(true);
-    if (fakeTimerRef.current) clearTimeout(fakeTimerRef.current);
-    fakeTimerRef.current = setTimeout(() => setSpeaking(false), duration);
 
-    if (!window.speechSynthesis) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/tts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
 
-    window.speechSynthesis.cancel();
+      if (!res.ok) throw new Error("TTS failed");
 
-    // Split long text into chunks (mobile Safari has a ~200 char limit)
-    const chunks = text.match(/.{1,150}[.!?,\s]|.+$/g) || [text];
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioRef.current = audio;
 
-    const speakChunks = (index: number) => {
-      if (index >= chunks.length) {
-        if (fakeTimerRef.current) clearTimeout(fakeTimerRef.current);
+      audio.onended = () => {
         setSpeaking(false);
-        return;
+        URL.revokeObjectURL(url);
+      };
+      audio.onerror = () => setSpeaking(false);
+      audio.play();
+    } catch (err) {
+      // Fallback to Web Speech API
+      console.warn("ElevenLabs failed, falling back to Web Speech:", err);
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.95;
+        utterance.pitch = 0.7;
+        const voices = window.speechSynthesis.getVoices();
+        const preferred = voices.find((v) => v.name === "Daniel") ||
+          voices.find((v) => v.lang.startsWith("en-US"));
+        if (preferred) utterance.voice = preferred;
+        utterance.onend = () => setSpeaking(false);
+        utterance.onerror = () => setSpeaking(false);
+        window.speechSynthesis.speak(utterance);
+      } else {
+        const duration = Math.max(text.length * 50, 2000);
+        setTimeout(() => setSpeaking(false), duration);
       }
-
-      const utterance = new SpeechSynthesisUtterance(chunks[index].trim());
-      utterance.rate = 1;
-      utterance.pitch = 1;
-
-      const voices = window.speechSynthesis.getVoices();
-      const preferred = voices.find(
-        (v) => v.lang.startsWith("en") && v.name.includes("Google")
-      ) || voices.find(
-        (v) => v.lang.startsWith("en") && v.name.includes("Daniel")
-      ) || voices.find(
-        (v) => v.lang.startsWith("en-US")
-      ) || voices.find(
-        (v) => v.lang.startsWith("en")
-      );
-      if (preferred) utterance.voice = preferred;
-
-      utterance.onstart = () => {
-        // Real TTS started, cancel fake timer
-        if (fakeTimerRef.current) clearTimeout(fakeTimerRef.current);
-        setSpeaking(true);
-      };
-      utterance.onend = () => speakChunks(index + 1);
-      utterance.onerror = () => {
-        // TTS failed, fake timer will handle lip-sync
-      };
-
-      utteranceRef.current = utterance;
-      window.speechSynthesis.speak(utterance);
-    };
-
-    speakChunks(0);
+    }
   };
 
   const stopSpeaking = () => {
     window.speechSynthesis?.cancel();
-    if (fakeTimerRef.current) clearTimeout(fakeTimerRef.current);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
     setSpeaking(false);
   };
 
@@ -212,9 +207,9 @@ export default function AiAssistant() {
     <section id="ai-assistant-section" className="ai-assistant-section">
       {/* 3D Avatar */}
       <div className="ai-avatar-wrapper">
-        <Avatar3D talking={isTalking} />
+        <Avatar3D talking={speaking} spokenText={answer} />
         <div className={`ai-status ${isTalking ? "active" : ""}`}>
-          {listening ? "Listening..." : loading ? "Thinking..." : speaking ? "Speaking..." : !serverReady ? "Waking up server..." : "Ask me anything about Adir"}
+          {listening ? "Listening..." : loading ? "Thinking..." : speaking ? "Speaking..." : !serverReady ? "Waking up server..." : ""}
         </div>
       </div>
 
@@ -243,9 +238,15 @@ export default function AiAssistant() {
         >
           <i className={listening ? "fa-solid fa-stop" : "fa-solid fa-microphone"}></i>
         </button>
-        <button onClick={askAI} disabled={loading}>
-          {loading ? "..." : "Ask"}
-        </button>
+        {speaking ? (
+          <button onClick={stopSpeaking} className="ai-stop-btn">
+            <i className="fa-solid fa-stop"></i>
+          </button>
+        ) : (
+          <button onClick={askAI} disabled={loading}>
+            {loading ? "..." : "Ask"}
+          </button>
+        )}
       </div>
 
       {/* Small Suggestion Chips */}

@@ -1,17 +1,43 @@
 .avatar-3d-container {
   position: relative;
-  width: 240px;
-  height: 280px;
+  width: 300px;
+  height: 350px;
   margin: 0 auto;
 }
 
+.avatar-3d-container::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(30, 60, 120, 0.4) 0%,
+    rgba(20, 40, 80, 0.2) 40%,
+    transparent 70%
+  );
+  filter: blur(20px);
+  z-index: 0;
+  pointer-events: none;
+}
+
 .avatar-3d-container canvas {
+  position: relative;
+  z-index: 1;
   border-radius: 16px;
 }
 
 @media (max-width: 768px) {
   .avatar-3d-container {
-    width: 200px;
-    height: 240px;
+    width: 250px;
+    height: 300px;
+  }
+  .avatar-3d-container::before {
+    width: 230px;
+    height: 230px;
   }
 }
