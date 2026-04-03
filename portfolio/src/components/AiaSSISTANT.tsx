@@ -18,6 +18,7 @@ export default function AiAssistant() {
   const [serverReady, setServerReady] = useState(false);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const recognitionRef = useRef<any>(null);
+  const fakeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const quickChips = [
     "What's your tech stack?",
@@ -39,6 +40,12 @@ export default function AiAssistant() {
   }, []);
 
   const speakText = (text: string) => {
+    // Start fake lip-sync immediately as fallback
+    const duration = Math.max(text.length * 50, 2000);
+    setSpeaking(true);
+    if (fakeTimerRef.current) clearTimeout(fakeTimerRef.current);
+    fakeTimerRef.current = setTimeout(() => setSpeaking(false), duration);
+
     if (!window.speechSynthesis) return;
 
     window.speechSynthesis.cancel();
@@ -48,6 +55,7 @@ export default function AiAssistant() {
 
     const speakChunks = (index: number) => {
       if (index >= chunks.length) {
+        if (fakeTimerRef.current) clearTimeout(fakeTimerRef.current);
         setSpeaking(false);
         return;
       }
@@ -68,9 +76,15 @@ export default function AiAssistant() {
       );
       if (preferred) utterance.voice = preferred;
 
-      utterance.onstart = () => setSpeaking(true);
+      utterance.onstart = () => {
+        // Real TTS started, cancel fake timer
+        if (fakeTimerRef.current) clearTimeout(fakeTimerRef.current);
+        setSpeaking(true);
+      };
       utterance.onend = () => speakChunks(index + 1);
-      utterance.onerror = () => setSpeaking(false);
+      utterance.onerror = () => {
+        // TTS failed, fake timer will handle lip-sync
+      };
 
       utteranceRef.current = utterance;
       window.speechSynthesis.speak(utterance);
@@ -80,7 +94,8 @@ export default function AiAssistant() {
   };
 
   const stopSpeaking = () => {
-    window.speechSynthesis.cancel();
+    window.speechSynthesis?.cancel();
+    if (fakeTimerRef.current) clearTimeout(fakeTimerRef.current);
     setSpeaking(false);
   };
 
