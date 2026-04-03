@@ -65,15 +65,23 @@ export default function AiAssistant() {
 
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
-      const audio = new Audio(url);
-      audioRef.current = audio;
+
+      // Reuse or create audio element (mobile requires user-gesture-initiated element)
+      if (!audioRef.current) {
+        audioRef.current = new Audio();
+      }
+      const audio = audioRef.current;
+      audio.src = url;
 
       audio.onended = () => {
         setSpeaking(false);
         URL.revokeObjectURL(url);
       };
-      audio.onerror = () => setSpeaking(false);
-      audio.play();
+      audio.onerror = () => {
+        setSpeaking(false);
+        URL.revokeObjectURL(url);
+      };
+      await audio.play();
     } catch (err) {
       // Fallback to Web Speech API
       console.warn("ElevenLabs failed, falling back to Web Speech:", err);
@@ -84,6 +92,9 @@ export default function AiAssistant() {
         utterance.pitch = 0.7;
         const voices = window.speechSynthesis.getVoices();
         const preferred = voices.find((v) => v.name === "Daniel") ||
+          voices.find((v) => v.name === "Aaron") ||
+          voices.find((v) => v.name.includes("Male") && v.lang.startsWith("en")) ||
+          voices.find((v) => v.lang.startsWith("en-GB")) ||
           voices.find((v) => v.lang.startsWith("en-US"));
         if (preferred) utterance.voice = preferred;
         utterance.onend = () => setSpeaking(false);
