@@ -8,11 +8,14 @@ const rateLimit = require("express-rate-limit");
 dotenv.config();
 const app = express();
 
-const allowedOrigins = [
-  "https://portfolio-eup2.onrender.com",
-  "http://localhost:5173",
-  "http://localhost:5174",
-];
+const allowedOrigins = (origin, callback) => {
+  // Allow requests from Render, localhost, and no origin (server-to-server)
+  if (!origin || origin.includes("onrender.com") || origin.includes("localhost")) {
+    callback(null, true);
+  } else {
+    callback(new Error("Not allowed by CORS"));
+  }
+};
 app.use(cors({ origin: allowedOrigins }));
 app.use(express.json({ limit: "10kb" }));
 
