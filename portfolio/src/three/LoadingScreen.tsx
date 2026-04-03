@@ -1,20 +1,43 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface LoadingScreenProps {
   progress: number;
   onComplete: () => void;
 }
 
+const GREETING = "Hey, I'm Adir.";
+const SUBTITLE = "Welcome to my world";
+
 export default function LoadingScreen({ progress, onComplete }: LoadingScreenProps) {
   const [fadeOut, setFadeOut] = useState(false);
   const hasCompleted = useRef(false);
+  const [typedChars, setTypedChars] = useState(0);
+  const [showSubtitle, setShowSubtitle] = useState(false);
+  const [showCursor, setShowCursor] = useState(true);
+
+  // Typewriter effect for greeting
+  useEffect(() => {
+    if (typedChars < GREETING.length) {
+      const timeout = setTimeout(() => setTypedChars((c) => c + 1), 80);
+      return () => clearTimeout(timeout);
+    } else {
+      // After greeting is done, show subtitle
+      const timeout = setTimeout(() => setShowSubtitle(true), 400);
+      return () => clearTimeout(timeout);
+    }
+  }, [typedChars]);
+
+  // Blinking cursor
+  useEffect(() => {
+    const interval = setInterval(() => setShowCursor((v) => !v), 530);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (progress >= 100 && !hasCompleted.current) {
       hasCompleted.current = true;
-      // Small delay then fade out
-      setTimeout(() => setFadeOut(true), 400);
-      setTimeout(() => onComplete(), 1200);
+      setTimeout(() => setFadeOut(true), 600);
+      setTimeout(() => onComplete(), 1400);
     }
   }, [progress, onComplete]);
 
@@ -29,63 +52,59 @@ export default function LoadingScreen({ progress, onComplete }: LoadingScreenPro
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        transition: "opacity 0.8s ease",
+        transition: "opacity 1s ease",
         opacity: fadeOut ? 0 : 1,
         pointerEvents: fadeOut ? "none" : "all",
       }}
     >
-      {/* Wireframe sphere animation via CSS */}
+      {/* Greeting with typewriter */}
       <div
         style={{
-          width: 120,
-          height: 120,
-          border: "1px solid rgba(74, 144, 217, 0.4)",
-          borderRadius: "50%",
-          animation: "spin3d 3s linear infinite",
-          marginBottom: 40,
-          boxShadow: "0 0 30px rgba(74, 144, 217, 0.15), inset 0 0 30px rgba(74, 144, 217, 0.08)",
-          position: "relative",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            inset: 10,
-            border: "1px solid rgba(74, 144, 217, 0.25)",
-            borderRadius: "50%",
-            animation: "spin3d 2s linear infinite reverse",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: 25,
-            border: "1px solid rgba(74, 144, 217, 0.15)",
-            borderRadius: "50%",
-            animation: "spin3d 4s linear infinite",
-          }}
-        />
-      </div>
-
-      <div
-        style={{
-          color: "#b0bec5",
           fontFamily: "'Poppins', sans-serif",
-          fontSize: "0.9rem",
-          letterSpacing: "0.2em",
-          textTransform: "uppercase",
-          marginBottom: 20,
+          fontSize: "clamp(1.8rem, 5vw, 3rem)",
+          fontWeight: 300,
+          letterSpacing: "0.02em",
+          color: "#fff",
+          marginBottom: 12,
+          minHeight: "1.2em",
         }}
       >
-        Loading Experience
+        {GREETING.slice(0, typedChars)}
+        <span
+          style={{
+            opacity: showCursor ? 1 : 0,
+            color: "#4a90d9",
+            fontWeight: 100,
+            transition: "opacity 0.1s",
+          }}
+        >
+          |
+        </span>
       </div>
 
-      {/* Progress bar */}
+      {/* Subtitle fade in */}
       <div
         style={{
-          width: 200,
-          height: 2,
-          background: "rgba(74, 144, 217, 0.15)",
+          fontFamily: "'Poppins', sans-serif",
+          fontSize: "clamp(0.85rem, 2vw, 1.05rem)",
+          fontWeight: 300,
+          letterSpacing: "0.15em",
+          color: "rgba(176, 190, 197, 0.8)",
+          marginBottom: 48,
+          opacity: showSubtitle ? 1 : 0,
+          transform: showSubtitle ? "translateY(0)" : "translateY(8px)",
+          transition: "opacity 0.8s ease, transform 0.8s ease",
+        }}
+      >
+        {SUBTITLE}
+      </div>
+
+      {/* Minimal line progress */}
+      <div
+        style={{
+          width: "min(220px, 60vw)",
+          height: 1,
+          background: "rgba(74, 144, 217, 0.12)",
           borderRadius: 1,
           overflow: "hidden",
         }}
@@ -100,25 +119,6 @@ export default function LoadingScreen({ progress, onComplete }: LoadingScreenPro
           }}
         />
       </div>
-
-      <div
-        style={{
-          color: "#4a90d9",
-          fontFamily: "'Poppins', sans-serif",
-          fontSize: "0.75rem",
-          marginTop: 10,
-          opacity: 0.7,
-        }}
-      >
-        {Math.round(progress)}%
-      </div>
-
-      <style>{`
-        @keyframes spin3d {
-          0% { transform: rotateX(0deg) rotateY(0deg); }
-          100% { transform: rotateX(360deg) rotateY(360deg); }
-        }
-      `}</style>
     </div>
   );
 }
