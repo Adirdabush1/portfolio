@@ -209,7 +209,7 @@ export default function AiAssistant() {
       <div className="ai-avatar-wrapper">
         <Avatar3D talking={speaking} spokenText={answer} />
         <div className={`ai-status ${isTalking ? "active" : ""}`}>
-          {listening ? "Listening..." : loading ? "Thinking..." : speaking ? "Speaking..." : !serverReady ? "Waking up server..." : ""}
+          {listening ? "Listening..." : loading ? "Thinking..." : !serverReady ? "Waking up server..." : ""}
         </div>
       </div>
 
