@@ -30,6 +30,12 @@ export default function AiAssistant() {
     fetch(`${API_BASE}/api/health`)
       .then(() => setServerReady(true))
       .catch(() => setServerReady(true));
+
+    // Preload voices (Chrome loads them async)
+    window.speechSynthesis?.getVoices();
+    window.speechSynthesis?.addEventListener?.("voiceschanged", () => {
+      window.speechSynthesis.getVoices();
+    });
   }, []);
 
   const speakText = (text: string) => {
@@ -37,27 +43,40 @@ export default function AiAssistant() {
 
     window.speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1;
-    utterance.pitch = 1;
+    // Split long text into chunks (mobile Safari has a ~200 char limit)
+    const chunks = text.match(/.{1,150}[.!?,\s]|.+$/g) || [text];
 
-    // Try to pick a good English voice
-    const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find(
-      (v) => v.lang.startsWith("en") && v.name.includes("Google")
-    ) || voices.find(
-      (v) => v.lang.startsWith("en") && v.name.includes("Daniel")
-    ) || voices.find(
-      (v) => v.lang.startsWith("en-US")
-    );
-    if (preferred) utterance.voice = preferred;
+    const speakChunks = (index: number) => {
+      if (index >= chunks.length) {
+        setSpeaking(false);
+        return;
+      }
 
-    utterance.onstart = () => setSpeaking(true);
-    utterance.onend = () => setSpeaking(false);
-    utterance.onerror = () => setSpeaking(false);
+      const utterance = new SpeechSynthesisUtterance(chunks[index].trim());
+      utterance.rate = 1;
+      utterance.pitch = 1;
 
-    utteranceRef.current = utterance;
-    window.speechSynthesis.speak(utterance);
+      const voices = window.speechSynthesis.getVoices();
+      const preferred = voices.find(
+        (v) => v.lang.startsWith("en") && v.name.includes("Google")
+      ) || voices.find(
+        (v) => v.lang.startsWith("en") && v.name.includes("Daniel")
+      ) || voices.find(
+        (v) => v.lang.startsWith("en-US")
+      ) || voices.find(
+        (v) => v.lang.startsWith("en")
+      );
+      if (preferred) utterance.voice = preferred;
+
+      utterance.onstart = () => setSpeaking(true);
+      utterance.onend = () => speakChunks(index + 1);
+      utterance.onerror = () => setSpeaking(false);
+
+      utteranceRef.current = utterance;
+      window.speechSynthesis.speak(utterance);
+    };
+
+    speakChunks(0);
   };
 
   const stopSpeaking = () => {
