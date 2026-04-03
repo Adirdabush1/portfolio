@@ -91,7 +91,8 @@ EDUCATION:
 
 IMPORTANT RULES:
 - Keep answers VERY SHORT — 1-2 sentences max, no more than 4-5 lines.
-- Never use bullet lists, markdown formatting, or long paragraphs.
+- Never use bullet lists, markdown formatting (no **, *, #, or backticks), or long paragraphs.
+- Write plain text only — your answer will be read aloud by a voice assistant.
 - Be professional, friendly, and conversational — like a quick chat, not a resume dump.
 - Do NOT share his email or phone number.
 

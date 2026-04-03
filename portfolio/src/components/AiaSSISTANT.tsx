@@ -39,7 +39,18 @@ export default function AiAssistant() {
     });
   }, []);
 
-  const speakText = (text: string) => {
+  const speakText = (rawText: string) => {
+    // Clean markdown/symbols for natural speech
+    const text = rawText
+      .replace(/\*\*/g, "")
+      .replace(/\*/g, "")
+      .replace(/#{1,6}\s?/g, "")
+      .replace(/`/g, "")
+      .replace(/\n/g, ". ")
+      .replace(/\s{2,}/g, " ")
+      .replace(/\.{2,}/g, ".")
+      .trim();
+
     // Start fake lip-sync immediately as fallback
     const duration = Math.max(text.length * 50, 2000);
     setSpeaking(true);
