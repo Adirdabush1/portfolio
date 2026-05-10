@@ -1,41 +1,37 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useEffect, useRef, useState } from "react";
-
 const GREETING = "Hey, I'm Adir.";
 const SUBTITLE = "Welcome to my world";
-
 export default function LoadingScreen({ progress, onComplete }) {
     const [fadeOut, setFadeOut] = useState(false);
     const hasCompleted = useRef(false);
     const [typedChars, setTypedChars] = useState(0);
     const [showSubtitle, setShowSubtitle] = useState(false);
     const [showCursor, setShowCursor] = useState(true);
-
-    // Typewriter effect
+    // Typewriter effect for greeting
     useEffect(() => {
         if (typedChars < GREETING.length) {
-            const timeout = setTimeout(() => setTypedChars((c) => c + 1), 130);
+            const timeout = setTimeout(() => setTypedChars((c) => c + 1), 80);
             return () => clearTimeout(timeout);
-        } else {
-            const timeout = setTimeout(() => setShowSubtitle(true), 700);
+        }
+        else {
+            // After greeting is done, show subtitle
+            const timeout = setTimeout(() => setShowSubtitle(true), 400);
             return () => clearTimeout(timeout);
         }
     }, [typedChars]);
-
     // Blinking cursor
     useEffect(() => {
         const interval = setInterval(() => setShowCursor((v) => !v), 530);
         return () => clearInterval(interval);
     }, []);
-
     useEffect(() => {
         if (progress >= 100 && !hasCompleted.current) {
             hasCompleted.current = true;
-            setTimeout(() => setFadeOut(true), 1200);
-            setTimeout(() => onComplete(), 2200);
+            setTimeout(() => setFadeOut(true), 600);
+            setTimeout(() => onComplete(), 1400);
         }
     }, [progress, onComplete]);
-
     return (_jsxs("div", { style: {
             position: "fixed",
             inset: 0,
@@ -48,8 +44,7 @@ export default function LoadingScreen({ progress, onComplete }) {
             transition: "opacity 1s ease",
             opacity: fadeOut ? 0 : 1,
             pointerEvents: fadeOut ? "none" : "all",
-        }, children: [
-            _jsxs("div", { style: {
+        }, children: [_jsxs("div", { style: {
                     fontFamily: "'Poppins', sans-serif",
                     fontSize: "clamp(1.8rem, 5vw, 3rem)",
                     fontWeight: 300,
@@ -57,16 +52,12 @@ export default function LoadingScreen({ progress, onComplete }) {
                     color: "#fff",
                     marginBottom: 12,
                     minHeight: "1.2em",
-                }, children: [
-                    GREETING.slice(0, typedChars),
-                    _jsx("span", { style: {
+                }, children: [GREETING.slice(0, typedChars), _jsx("span", { style: {
                             opacity: showCursor ? 1 : 0,
                             color: "#4a90d9",
                             fontWeight: 100,
                             transition: "opacity 0.1s",
-                        }, children: "|" }),
-                ] }),
-            _jsx("div", { style: {
+                        }, children: "|" })] }), _jsx("div", { style: {
                     fontFamily: "'Poppins', sans-serif",
                     fontSize: "clamp(0.85rem, 2vw, 1.05rem)",
                     fontWeight: 300,
@@ -76,8 +67,7 @@ export default function LoadingScreen({ progress, onComplete }) {
                     opacity: showSubtitle ? 1 : 0,
                     transform: showSubtitle ? "translateY(0)" : "translateY(8px)",
                     transition: "opacity 0.8s ease, transform 0.8s ease",
-                }, children: SUBTITLE }),
-            _jsx("div", { style: {
+                }, children: SUBTITLE }), _jsx("div", { style: {
                     width: "min(220px, 60vw)",
                     height: 1,
                     background: "rgba(74, 144, 217, 0.12)",
@@ -89,6 +79,5 @@ export default function LoadingScreen({ progress, onComplete }) {
                         background: "linear-gradient(90deg, #4a90d9, #efd09e)",
                         transition: "width 0.3s ease",
                         borderRadius: 1,
-                    } }) }),
-        ] }));
+                    } }) })] }));
 }

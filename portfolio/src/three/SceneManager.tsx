@@ -88,12 +88,14 @@ export default function SceneManager() {
       alpha: true,
       powerPreference: "high-performance",
     });
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    const initialW = window.visualViewport?.width ?? window.innerWidth;
+    const initialH = window.visualViewport?.height ?? window.innerHeight;
+    renderer.setSize(initialW, initialH, false);
     renderer.setPixelRatio(getPixelRatio());
     renderer.setClearColor(0x000000, 0);
     rendererRef.current = renderer;
 
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(60, initialW / initialH, 0.1, 100);
     camera.position.set(0, 0, 12);
     cameraRef.current = camera;
 
@@ -159,15 +161,22 @@ export default function SceneManager() {
     window.addEventListener("scroll", handleNativeScroll, { passive: true });
 
     const handleResize = () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
+      // Prefer visualViewport on mobile so the canvas tracks the URL bar
+      const vv = window.visualViewport;
+      const w = vv ? vv.width : window.innerWidth;
+      const h = vv ? vv.height : window.innerHeight;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
+      renderer.setSize(w, h, false);
       renderer.setPixelRatio(getPixelRatio());
       ScrollTrigger.refresh();
     };
     window.addEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", handleResize);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", handleResize);
+      window.visualViewport.addEventListener("scroll", handleResize);
+    }
 
     // Animation loop
     const animate = () => {
@@ -225,6 +234,11 @@ export default function SceneManager() {
       cancelAnimationFrame(rafRef.current);
       scrollTrigger.kill();
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleResize);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", handleResize);
+        window.visualViewport.removeEventListener("scroll", handleResize);
+      }
       window.removeEventListener("scroll", handleNativeScroll);
 
       s.heroBrain?.dispose();
@@ -254,8 +268,8 @@ export default function SceneManager() {
           position: "fixed",
           top: 0,
           left: 0,
-          width: "100%",
-          height: "100%",
+          width: "100vw",
+          height: "100dvh",
           zIndex: 0,
           pointerEvents: "none",
           opacity: loaded ? 1 : 0,

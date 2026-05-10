@@ -61,6 +61,7 @@ export default function SceneManager() {
         setTimeout(() => ScrollTrigger.refresh(true), 300);
     }, []);
     useEffect(() => {
+        var _a, _b, _c, _d;
         if (mobile || !canvasRef.current)
             return;
         const canvas = canvasRef.current;
@@ -73,11 +74,13 @@ export default function SceneManager() {
             alpha: true,
             powerPreference: "high-performance",
         });
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        const initialW = (_b = (_a = window.visualViewport) === null || _a === void 0 ? void 0 : _a.width) !== null && _b !== void 0 ? _b : window.innerWidth;
+        const initialH = (_d = (_c = window.visualViewport) === null || _c === void 0 ? void 0 : _c.height) !== null && _d !== void 0 ? _d : window.innerHeight;
+        renderer.setSize(initialW, initialH, false);
         renderer.setPixelRatio(getPixelRatio());
         renderer.setClearColor(0x000000, 0);
         rendererRef.current = renderer;
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+        const camera = new THREE.PerspectiveCamera(60, initialW / initialH, 0.1, 100);
         camera.position.set(0, 0, 12);
         cameraRef.current = camera;
         cameraPathRef.current = new CameraPath();
@@ -89,7 +92,7 @@ export default function SceneManager() {
         // Loading simulation
         let progress = 0;
         const loadInterval = setInterval(() => {
-            progress += Math.random() * 8 + 3;
+            progress += Math.random() * 15 + 5;
             if (progress >= 100) {
                 progress = 100;
                 clearInterval(loadInterval);
@@ -139,15 +142,22 @@ export default function SceneManager() {
         };
         window.addEventListener("scroll", handleNativeScroll, { passive: true });
         const handleResize = () => {
-            const w = window.innerWidth;
-            const h = window.innerHeight;
+            // Prefer visualViewport on mobile so the canvas tracks the URL bar
+            const vv = window.visualViewport;
+            const w = vv ? vv.width : window.innerWidth;
+            const h = vv ? vv.height : window.innerHeight;
             camera.aspect = w / h;
             camera.updateProjectionMatrix();
-            renderer.setSize(w, h);
+            renderer.setSize(w, h, false);
             renderer.setPixelRatio(getPixelRatio());
             ScrollTrigger.refresh();
         };
         window.addEventListener("resize", handleResize);
+        window.addEventListener("orientationchange", handleResize);
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener("resize", handleResize);
+            window.visualViewport.addEventListener("scroll", handleResize);
+        }
         // Animation loop
         const animate = () => {
             var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
@@ -221,6 +231,11 @@ export default function SceneManager() {
             cancelAnimationFrame(rafRef.current);
             scrollTrigger.kill();
             window.removeEventListener("resize", handleResize);
+            window.removeEventListener("orientationchange", handleResize);
+            if (window.visualViewport) {
+                window.visualViewport.removeEventListener("resize", handleResize);
+                window.visualViewport.removeEventListener("scroll", handleResize);
+            }
             window.removeEventListener("scroll", handleNativeScroll);
             (_a = s.heroBrain) === null || _a === void 0 ? void 0 : _a.dispose();
             (_b = s.skillsNetwork) === null || _b === void 0 ? void 0 : _b.dispose();
@@ -240,8 +255,8 @@ export default function SceneManager() {
                     position: "fixed",
                     top: 0,
                     left: 0,
-                    width: "100%",
-                    height: "100%",
+                    width: "100vw",
+                    height: "100dvh",
                     zIndex: 0,
                     pointerEvents: "none",
                     opacity: loaded ? 1 : 0,

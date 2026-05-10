@@ -9,6 +9,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           three: ['three'],
+          rapier: ['@react-three/rapier', '@dimforge/rapier3d-compat'],
         },
       },
     },
