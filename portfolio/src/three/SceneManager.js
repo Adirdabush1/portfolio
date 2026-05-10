@@ -114,11 +114,6 @@ export default function SceneManager() {
         // Create sections
         const s = sectionsRef.current;
         s.heroBrain = new HeroBrain(scene);
-        // On small screens, scale the brain up so it fills the viewport
-        const smallView = initialW < 768;
-        if (smallView) {
-            s.heroBrain.group.scale.setScalar(1.55);
-        }
         s.skillsNetwork = new SkillsNetwork(scene);
         s.dataStream = new DataStream(scene);
         s.soundWaves = new SoundWaves(scene);
