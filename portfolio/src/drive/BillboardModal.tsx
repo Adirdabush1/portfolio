@@ -386,13 +386,13 @@ function ContactContent() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 18 }}>
         <a
-          href="mailto:adir.dabush@msapps.mobi"
+          href="mailto:adiraws2025@gmail.com"
           style={{ ...buttonStyle, display: "inline-block", textAlign: "center", textDecoration: "none" }}
         >
-          📧 adir.dabush@msapps.mobi
+          📧 adiraws2025@gmail.com
         </a>
         <a
-          href="https://github.com/adirdabush"
+          href="https://github.com/Adirdabush1"
           target="_blank"
           rel="noreferrer"
           style={{ ...linkButton, display: "inline-block", textAlign: "center", textDecoration: "none" }}
@@ -400,7 +400,7 @@ function ContactContent() {
           GitHub ↗
         </a>
         <a
-          href="https://www.linkedin.com/in/adir-dabush/"
+          href="https://il.linkedin.com/in/adir-dabush-11a97b2b9"
           target="_blank"
           rel="noreferrer"
           style={{ ...linkButton, display: "inline-block", textAlign: "center", textDecoration: "none" }}
