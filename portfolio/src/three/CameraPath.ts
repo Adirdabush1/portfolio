@@ -1,11 +1,13 @@
 import * as THREE from "three";
 
-// Camera journey: start outside brain → zoom INTO the brain → travel through neural corridors
+// Camera journey: start outside brain → zoom INTO the brain → travel through neural corridors.
+// Hero zoom is front-loaded so even a small scroll on mobile already shows
+// the camera diving into the sphere.
 const positionPoints = [
-  // Hero: outside looking at brain, then zooming IN
-  new THREE.Vector3(0, 0, 12),     // Far view of brain
-  new THREE.Vector3(0, 0, 6),      // Closer to brain
-  new THREE.Vector3(0, 0, 2),      // At brain surface
+  // Hero: outside looking at brain, then zooming IN (compressed range)
+  new THREE.Vector3(0, 0, 9),      // Initial framing
+  new THREE.Vector3(0, 0, 5),      // Closing in
+  new THREE.Vector3(0, 0, 1.5),    // At brain surface
   new THREE.Vector3(0, 0, 0),      // ENTERING the brain
   // Inside the brain: traveling through neural corridors
   new THREE.Vector3(0, 0, -3),     // Skills — inside brain, looking at network
@@ -50,7 +52,9 @@ export class CameraPath {
   }
 
   update(camera: THREE.PerspectiveCamera, progress: number) {
-    const t = THREE.MathUtils.clamp(progress, 0, 1);
+    const clamped = THREE.MathUtils.clamp(progress, 0, 1);
+    // Front-load the camera move: small scroll = big visual change early on
+    const t = Math.pow(clamped, 0.65);
     this.positionCurve.getPoint(t, this.tempPos);
     this.lookAtCurve.getPoint(t, this.tempLookAt);
     camera.position.copy(this.tempPos);
