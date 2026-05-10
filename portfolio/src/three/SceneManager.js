@@ -129,9 +129,12 @@ export default function SceneManager() {
             scrub: 0.5,
             onUpdate: (self) => { scrollProgressRef.current = self.progress; },
         });
-        // Native scroll fallback for iOS — fires during momentum scroll
-        const handleNativeScroll = () => {
+        // Native scroll fallback for iOS — fires during momentum scroll.
+        // rAF-throttled so touchmove at 120Hz doesn't spam the calculation.
+        let scrollRafScheduled = false;
+        const updateProgressFromScroll = () => {
             var _a, _b;
+            scrollRafScheduled = false;
             const scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
             const docEl = document.documentElement;
             const viewportH = (_b = (_a = window.visualViewport) === null || _a === void 0 ? void 0 : _a.height) !== null && _b !== void 0 ? _b : window.innerHeight;
@@ -140,10 +143,13 @@ export default function SceneManager() {
                 scrollProgressRef.current = Math.min(Math.max(scrollTop / docHeight, 0), 1);
             }
         };
+        const handleNativeScroll = () => {
+            if (scrollRafScheduled)
+                return;
+            scrollRafScheduled = true;
+            requestAnimationFrame(updateProgressFromScroll);
+        };
         window.addEventListener("scroll", handleNativeScroll, { passive: true });
-        // Touchmove backup: some iOS Safari versions throttle the `scroll`
-        // event during touch drags. This guarantees progress updates while the
-        // finger is on the screen.
         window.addEventListener("touchmove", handleNativeScroll, { passive: true });
         const handleResize = () => {
             // Prefer visualViewport on mobile so the canvas tracks the URL bar
@@ -161,7 +167,11 @@ export default function SceneManager() {
         window.addEventListener("orientationchange", handleResize);
         if (window.visualViewport) {
             window.visualViewport.addEventListener("resize", handleResize);
-            window.visualViewport.addEventListener("scroll", handleResize);
+            // Note: visualViewport.scroll fires during URL bar collapse on iOS;
+            // we deliberately do NOT call handleResize here because setSize +
+            // setPixelRatio + ScrollTrigger.refresh on every URL bar twitch
+            // tanks scroll performance. The progress is already tracked by the
+            // window scroll/touchmove listeners.
         }
         // Animation loop
         const animate = () => {
@@ -240,7 +250,6 @@ export default function SceneManager() {
             window.removeEventListener("touchmove", handleNativeScroll);
             if (window.visualViewport) {
                 window.visualViewport.removeEventListener("resize", handleResize);
-                window.visualViewport.removeEventListener("scroll", handleResize);
             }
             window.removeEventListener("scroll", handleNativeScroll);
             (_a = s.heroBrain) === null || _a === void 0 ? void 0 : _a.dispose();
