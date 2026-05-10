@@ -34,12 +34,10 @@ export default function HomePage() {
             >
               Hey I'm Adir
             </GradientText>
+            <div className="hero-subline">
+              Software engineer · 3D · AI
+            </div>
           </div>
-          <img
-            src="/homepage.jpg"
-            alt="Adir"
-            className="hero-image puff-in-hor"
-          />
         </div>
       </div>
 
