@@ -131,16 +131,20 @@ export default function SceneManager() {
         });
         // Native scroll fallback for iOS — fires during momentum scroll
         const handleNativeScroll = () => {
-            const wrapper = document.getElementById("page-wrapper");
-            if (!wrapper)
-                return;
-            const scrollTop = window.scrollY || document.documentElement.scrollTop;
-            const docHeight = wrapper.scrollHeight - window.innerHeight;
+            var _a, _b;
+            const scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
+            const docEl = document.documentElement;
+            const viewportH = (_b = (_a = window.visualViewport) === null || _a === void 0 ? void 0 : _a.height) !== null && _b !== void 0 ? _b : window.innerHeight;
+            const docHeight = docEl.scrollHeight - viewportH;
             if (docHeight > 0) {
                 scrollProgressRef.current = Math.min(Math.max(scrollTop / docHeight, 0), 1);
             }
         };
         window.addEventListener("scroll", handleNativeScroll, { passive: true });
+        // Touchmove backup: some iOS Safari versions throttle the `scroll`
+        // event during touch drags. This guarantees progress updates while the
+        // finger is on the screen.
+        window.addEventListener("touchmove", handleNativeScroll, { passive: true });
         const handleResize = () => {
             // Prefer visualViewport on mobile so the canvas tracks the URL bar
             const vv = window.visualViewport;
@@ -151,6 +155,7 @@ export default function SceneManager() {
             renderer.setSize(w, h, false);
             renderer.setPixelRatio(getPixelRatio());
             ScrollTrigger.refresh();
+            handleNativeScroll();
         };
         window.addEventListener("resize", handleResize);
         window.addEventListener("orientationchange", handleResize);
@@ -232,6 +237,7 @@ export default function SceneManager() {
             scrollTrigger.kill();
             window.removeEventListener("resize", handleResize);
             window.removeEventListener("orientationchange", handleResize);
+            window.removeEventListener("touchmove", handleNativeScroll);
             if (window.visualViewport) {
                 window.visualViewport.removeEventListener("resize", handleResize);
                 window.visualViewport.removeEventListener("scroll", handleResize);
