@@ -18,15 +18,15 @@ const chatId = () => process.env.TELEGRAM_CHAT_ID;
 const formatJobMessage = (job) => {
   const overlaps = (job.overlaps || []).slice(0, 3).map((o, i) => `${i + 1}. ${o}`).join("\n");
   return [
-    `🎯 *${escapeMd(job.title || "(no title)")}*`,
-    `🏢 ${escapeMd(job.company || "(no company)")}`,
-    `📍 ${escapeMd(job.location || "(no location)")}`,
-    `⭐ Relevance: ${job.relevance_score}/100`,
+    `🎯 *${escapeMd(job.title || "(ללא כותרת)")}*`,
+    `🏢 ${escapeMd(job.company || "(ללא חברה)")}`,
+    `📍 ${escapeMd(job.location || "(ללא מיקום)")}`,
+    `⭐ התאמה: ${job.relevance_score}/100`,
     "",
     `_${escapeMd((job.relevance_reason || "").slice(0, 200))}_`,
     "",
-    "Overlaps:",
-    escapeMd(overlaps || "(none)"),
+    "נקודות חיבור:",
+    escapeMd(overlaps || "(אין)"),
     "",
     `🔗 ${escapeMd(job.url)}`,
   ].join("\n");
@@ -42,9 +42,9 @@ const sendJobApproval = async (job) => {
     reply_markup: {
       inline_keyboard: [
         [
-          { text: "✅ Approve", callback_data: `approve:${job.id}` },
-          { text: "⏭ Skip",    callback_data: `skip:${job.id}` },
-          { text: "✏️ Edit",   callback_data: `edit:${job.id}` },
+          { text: "✅ אישור",   callback_data: `approve:${job.id}` },
+          { text: "⏭ דילוג",    callback_data: `skip:${job.id}` },
+          { text: "✏️ עריכה",   callback_data: `edit:${job.id}` },
         ],
       ],
     },
@@ -67,46 +67,46 @@ const handleCallbackQuery = async (cb) => {
   const [action, jobIdStr] = (cb.data || "").split(":");
   const jobId = Number(jobIdStr);
   if (!jobId) {
-    await b.answerCallbackQuery(cb.id, { text: "Bad payload" });
+    await b.answerCallbackQuery(cb.id, { text: "פעולה לא חוקית" });
     return;
   }
   const job = await db.getJob(jobId);
   if (!job) {
-    await b.answerCallbackQuery(cb.id, { text: "Job not found" });
+    await b.answerCallbackQuery(cb.id, { text: "המשרה לא נמצאה" });
     return;
   }
 
   if (action === "skip") {
     await db.setJobStatus(jobId, "rejected");
-    await b.answerCallbackQuery(cb.id, { text: "Skipped" });
+    await b.answerCallbackQuery(cb.id, { text: "דולג" });
     await b.editMessageReplyMarkup({ inline_keyboard: [] }, {
       chat_id: cb.message.chat.id, message_id: cb.message.message_id,
     });
-    await b.sendMessage(cb.message.chat.id, `⏭ Skipped: ${job.title} @ ${job.company}`);
+    await b.sendMessage(cb.message.chat.id, `⏭ דולג: ${job.title} @ ${job.company}`);
     return;
   }
 
   if (action === "approve" || action === "edit") {
-    await b.answerCallbackQuery(cb.id, { text: "Composing email..." });
+    await b.answerCallbackQuery(cb.id, { text: "מנסח מייל..." });
 
     const composed = await composer.compose({ job, overlaps: job.overlaps || [] });
     if (composed.error) {
-      await b.sendMessage(cb.message.chat.id, `❌ Compose failed: ${composed.error}`);
+      await b.sendMessage(cb.message.chat.id, `❌ ניסוח נכשל: ${composed.error}`);
       return;
     }
 
     if (action === "edit") {
       const draft = await b.sendMessage(
         cb.message.chat.id,
-        `✏️ Draft for *${escapeMd(job.title)}* @ *${escapeMd(job.company)}*\n\n` +
-        `*Subject:* ${escapeMd(composed.subject)}\n\n${escapeMd(composed.body)}\n\n` +
-        `_Reply to this message with corrections, or click Send below._`,
+        `✏️ טיוטה ל\\-*${escapeMd(job.title)}* @ *${escapeMd(job.company)}*\n\n` +
+        `*נושא:* ${escapeMd(composed.subject)}\n\n${escapeMd(composed.body)}\n\n` +
+        `_ענה להודעה הזו עם תיקונים, או לחץ על "שלח כפי שהוא" למטה._`,
         {
           parse_mode: "MarkdownV2",
           reply_markup: {
             inline_keyboard: [[
-              { text: "📤 Send as-is", callback_data: `send:${job.id}` },
-              { text: "⏭ Cancel",      callback_data: `skip:${job.id}` },
+              { text: "📤 שלח כפי שהוא", callback_data: `send:${job.id}` },
+              { text: "⏭ ביטול",          callback_data: `skip:${job.id}` },
             ]],
           },
         }
@@ -115,19 +115,19 @@ const handleCallbackQuery = async (cb) => {
       return;
     }
 
-    // approve → send immediately
+    // approve, send immediately
     const sentTo = job.contact_email;
     if (!sentTo) {
       await b.sendMessage(cb.message.chat.id,
-        `⚠️ No contact email on file for this job. Reply with the recruiter's email to send.`);
+        `⚠️ אין כתובת מייל של מגייס למשרה הזו. ענה להודעה הזו עם כתובת המייל לשליחה.`);
       await db.updateTelegramDraft(job.id, cb.message.message_id, JSON.stringify(composed));
       return;
     }
     const result = await sender.send({ job, sentTo, subject: composed.subject, body: composed.body });
     if (result.sent) {
-      await b.sendMessage(cb.message.chat.id, `✅ Sent to ${sentTo}: ${job.title} @ ${job.company}`);
+      await b.sendMessage(cb.message.chat.id, `✅ נשלח ל-${sentTo}: ${job.title} @ ${job.company}`);
     } else {
-      await b.sendMessage(cb.message.chat.id, `❌ Send failed: ${result.reason}`);
+      await b.sendMessage(cb.message.chat.id, `❌ שליחה נכשלה: ${result.reason}`);
     }
     return;
   }
@@ -135,22 +135,22 @@ const handleCallbackQuery = async (cb) => {
   if (action === "send") {
     const tg = await db.findTelegramMessageByMsgId(cb.message.message_id);
     if (!tg || !tg.draft_email_body) {
-      await b.answerCallbackQuery(cb.id, { text: "Draft expired" });
+      await b.answerCallbackQuery(cb.id, { text: "הטיוטה פגה" });
       return;
     }
     const composed = JSON.parse(tg.draft_email_body);
     if (!job.contact_email) {
-      await b.answerCallbackQuery(cb.id, { text: "Need recipient — reply with email" });
+      await b.answerCallbackQuery(cb.id, { text: "חסר נמען, ענה עם כתובת מייל" });
       return;
     }
     const result = await sender.send({
       job, sentTo: job.contact_email, subject: composed.subject, body: composed.body,
     });
-    await b.answerCallbackQuery(cb.id, { text: result.sent ? "Sent" : `Failed: ${result.reason}` });
+    await b.answerCallbackQuery(cb.id, { text: result.sent ? "נשלח" : `נכשל: ${result.reason}` });
     return;
   }
 
-  await b.answerCallbackQuery(cb.id, { text: "Unknown action" });
+  await b.answerCallbackQuery(cb.id, { text: "פעולה לא ידועה" });
 };
 
 const handleReply = async (msg) => {
@@ -172,7 +172,7 @@ const handleReply = async (msg) => {
       job, sentTo: userEdits.trim(), subject: composed.subject, body: composed.body,
     });
     await getBot().sendMessage(msg.chat.id,
-      result.sent ? `✅ Sent to ${userEdits.trim()}` : `❌ ${result.reason}`);
+      result.sent ? `✅ נשלח ל-${userEdits.trim()}` : `❌ ${result.reason}`);
     return true;
   }
 
@@ -185,18 +185,18 @@ const handleReply = async (msg) => {
     ],
   });
   if (recomposed.error) {
-    await getBot().sendMessage(msg.chat.id, `❌ Recompose failed: ${recomposed.error}`);
+    await getBot().sendMessage(msg.chat.id, `❌ ניסוח מחדש נכשל: ${recomposed.error}`);
     return true;
   }
   const next = await getBot().sendMessage(
     msg.chat.id,
-    `✏️ Revised draft:\n\n*Subject:* ${escapeMd(recomposed.subject)}\n\n${escapeMd(recomposed.body)}`,
+    `✏️ טיוטה מעודכנת:\n\n*נושא:* ${escapeMd(recomposed.subject)}\n\n${escapeMd(recomposed.body)}`,
     {
       parse_mode: "MarkdownV2",
       reply_markup: {
         inline_keyboard: [[
-          { text: "📤 Send as-is", callback_data: `send:${job.id}` },
-          { text: "⏭ Cancel",      callback_data: `skip:${job.id}` },
+          { text: "📤 שלח כפי שהוא", callback_data: `send:${job.id}` },
+          { text: "⏭ ביטול",          callback_data: `skip:${job.id}` },
         ]],
       },
     }
@@ -210,7 +210,7 @@ const handleAddCommand = async (msg) => {
   const m = msg.text?.match(/^\/add\s+(https?:\/\/\S+)/i);
   if (!m) return false;
   await db.enqueueManual(m[1]);
-  await getBot().sendMessage(msg.chat.id, `📥 Queued: ${m[1]}`);
+  await getBot().sendMessage(msg.chat.id, `📥 נוספה לתור: ${m[1]}`);
   return true;
 };
 
