@@ -2,6 +2,7 @@ const db = require("./db");
 const rss = require("./scrapers/rss");
 const linkedin = require("./scrapers/linkedin");
 const manual = require("./scrapers/manual");
+const hn = require("./scrapers/hn");
 const { extractDescription } = require("./extractText");
 const relevance = require("./relevance");
 const locationFilter = require("./locationFilter");
@@ -16,6 +17,7 @@ const fetchFromAllSources = async () => {
     rss.fetch(),
     linkedin.fetch(),
     manual.fetch(),
+    hn.fetch(),
   ]);
   const out = [];
   for (const r of settled) {
