@@ -4,6 +4,7 @@ const linkedin = require("./scrapers/linkedin");
 const manual = require("./scrapers/manual");
 const { extractDescription } = require("./extractText");
 const relevance = require("./relevance");
+const locationFilter = require("./locationFilter");
 const telegram = require("./telegram");
 const { sleep } = require("./groqClient");
 
@@ -58,6 +59,21 @@ const run = async () => {
         if (!hydrated.description || hydrated.description.length < 100) {
           await db.updateJobRelevance(job.id, {
             score: 0, reason: "", rejection_reason: "empty-description",
+            overlaps: [], ai_metadata: null, status: "rejected",
+          });
+          continue;
+        }
+
+        // Hard location pre-filter: drop foreign-only / no-signal jobs before
+        // paying Groq tokens. Israel + remote are kept.
+        const loc = locationFilter.classify({
+          title: hydrated.title,
+          location: hydrated.location,
+          description: hydrated.description,
+        });
+        if (!loc.startsWith("pass")) {
+          await db.updateJobRelevance(job.id, {
+            score: 0, reason: "", rejection_reason: `location:${loc}`,
             overlaps: [], ai_metadata: null, status: "rejected",
           });
           continue;

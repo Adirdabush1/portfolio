@@ -30,10 +30,15 @@ Start at 50. Adjust:
   +15  iOS production work, Swift, mobile SDK, or large-scale app development
   +15  Requires 1-3 years experience (sweet spot, he has ~20 months)
   +10  Says "2+ years" or "3+ years" (apply anyway, depth in AI offsets month gap)
-  +10  Location is Israel (any city) OR fully remote
+  +15  Location is Herzliya OR Tel Aviv (Adir lives in Herzliya, this is his sweet spot)
+  +12  Location is Gush Dan / Greater TA: Ramat Gan, Givatayim, Bnei Brak, Petah Tikva
+   +8  Location is Sharon / central Israel: Netanya, Raanana, Kfar Saba, Hod Hasharon,
+       Rishon LeZion, Holon, Modi'in, Rehovot
+   +6  Fully remote (anywhere, Israel-compatible)
+   +3  Far Israel cities: Haifa, Beersheba, Eilat (still acceptable, but commute matters)
   +10  AI-first product company, or company that markets AI as a core feature
    +5  Mentions Figma-to-code, design-to-UI, marketing experiences, product collab
-   +5  Hybrid in Tel Aviv / Herzliya area
+   +5  Hybrid arrangement (1-3 days office) in a preferred zone
 
   -30  Requires 5+ years OR explicitly Senior/Staff/Principal/Lead (full-time)
   -40  Role is NOT engineering (Sales, Marketing, QA, Support, HR, Product Mgmt,
