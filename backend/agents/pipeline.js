@@ -3,6 +3,7 @@ const rss = require("./scrapers/rss");
 const linkedin = require("./scrapers/linkedin");
 const manual = require("./scrapers/manual");
 const hn = require("./scrapers/hn");
+const telegramChannels = require("./scrapers/telegramChannels");
 const { extractDescription } = require("./extractText");
 const relevance = require("./relevance");
 const locationFilter = require("./locationFilter");
@@ -18,6 +19,7 @@ const fetchFromAllSources = async () => {
     linkedin.fetch(),
     manual.fetch(),
     hn.fetch(),
+    telegramChannels.fetch(),
   ]);
   const out = [];
   for (const r of settled) {
