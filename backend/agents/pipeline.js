@@ -73,11 +73,14 @@ const run = async () => {
         }
 
         // Hard location pre-filter: drop foreign-only / no-signal jobs before
-        // paying Groq tokens. Israel + remote are kept.
+        // paying Groq tokens. Israel + remote are kept. Trusted sources
+        // (Telegram Israeli channels, LinkedIn Israel search) bypass keyword
+        // matching since they are location-filtered upstream.
         const loc = locationFilter.classify({
           title: hydrated.title,
           location: hydrated.location,
           description: hydrated.description,
+          source: hydrated.source,
         });
         if (!loc.startsWith("pass")) {
           await db.updateJobRelevance(job.id, {

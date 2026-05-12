@@ -18,17 +18,17 @@ const chatId = () => process.env.TELEGRAM_CHAT_ID;
 const formatJobMessage = (job) => {
   const overlaps = (job.overlaps || []).slice(0, 3).map((o, i) => `${i + 1}. ${o}`).join("\n");
   return [
-    `🎯 *${escapeMd(job.title || "(ללא כותרת)")}*`,
-    `🏢 ${escapeMd(job.company || "(ללא חברה)")}`,
-    `📍 ${escapeMd(job.location || "(ללא מיקום)")}`,
+    `🎯 ${job.title || "(ללא כותרת)"}`,
+    `🏢 ${job.company || "(ללא חברה)"}`,
+    `📍 ${job.location || "(ללא מיקום)"}`,
     `⭐ התאמה: ${job.relevance_score}/100`,
     "",
-    `_${escapeMd((job.relevance_reason || "").slice(0, 200))}_`,
+    (job.relevance_reason || "").slice(0, 250),
     "",
     "נקודות חיבור:",
-    escapeMd(overlaps || "(אין)"),
+    overlaps || "(אין)",
     "",
-    `🔗 ${escapeMd(job.url)}`,
+    `🔗 ${job.url}`,
   ].join("\n");
 };
 
@@ -37,7 +37,6 @@ const escapeMd = (s) => String(s || "").replace(/([_*[\]()~`>#+\-=|{}.!])/g, "\\
 const sendJobApproval = async (job) => {
   const text = formatJobMessage(job);
   const msg = await getBot().sendMessage(chatId(), text, {
-    parse_mode: "MarkdownV2",
     disable_web_page_preview: true,
     reply_markup: {
       inline_keyboard: [
@@ -98,11 +97,10 @@ const handleCallbackQuery = async (cb) => {
     if (action === "edit") {
       const draft = await b.sendMessage(
         cb.message.chat.id,
-        `✏️ טיוטה ל\\-*${escapeMd(job.title)}* @ *${escapeMd(job.company)}*\n\n` +
-        `*נושא:* ${escapeMd(composed.subject)}\n\n${escapeMd(composed.body)}\n\n` +
-        `_ענה להודעה הזו עם תיקונים, או לחץ על "שלח כפי שהוא" למטה._`,
+        `✏️ טיוטה ל-${job.title} @ ${job.company}\n\n` +
+        `נושא: ${composed.subject}\n\n${composed.body}\n\n` +
+        `(ענה להודעה הזו עם תיקונים, או לחץ על "שלח כפי שהוא" למטה)`,
         {
-          parse_mode: "MarkdownV2",
           reply_markup: {
             inline_keyboard: [[
               { text: "📤 שלח כפי שהוא", callback_data: `send:${job.id}` },
@@ -190,9 +188,8 @@ const handleReply = async (msg) => {
   }
   const next = await getBot().sendMessage(
     msg.chat.id,
-    `✏️ טיוטה מעודכנת:\n\n*נושא:* ${escapeMd(recomposed.subject)}\n\n${escapeMd(recomposed.body)}`,
+    `✏️ טיוטה מעודכנת:\n\nנושא: ${recomposed.subject}\n\n${recomposed.body}`,
     {
-      parse_mode: "MarkdownV2",
       reply_markup: {
         inline_keyboard: [[
           { text: "📤 שלח כפי שהוא", callback_data: `send:${job.id}` },

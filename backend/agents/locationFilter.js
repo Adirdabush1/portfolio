@@ -5,6 +5,7 @@
 
 const ISRAEL_KEYWORDS = [
   "israel", "ישראל",
+  // Major cities (English)
   "tel aviv", "tel-aviv", "tlv", "herzliya", "herzeliya",
   "jerusalem", "haifa", "netanya", "ramat gan", "ramat-gan",
   "petah tikva", "petach tikva", "rishon lezion", "rishon le zion",
@@ -12,10 +13,27 @@ const ISRAEL_KEYWORDS = [
   "raanana", "ra'anana", "kfar saba", "modiin", "modi'in",
   "givatayim", "rehovot", "kiryat", "ashkelon", "yokneam",
   "caesarea", "nazareth", "eilat",
+  // Hebrew cities
   "תל אביב", "תל-אביב", "הרצליה", "ירושלים", "חיפה", "נתניה",
   "רמת גן", "פתח תקווה", "ראשון לציון", "באר שבע", "אשדוד",
   "חולון", "בני ברק", "רעננה", "כפר סבא", "מודיעין", "גבעתיים",
   "רחובות", "אשקלון", "יוקנעם",
+  // Hebrew regional indicators (very common in Israeli job posts)
+  "אזור המרכז", "מרכז הארץ", "אזור השרון", "השרון", "אזור הצפון",
+  "אזור הדרום", "השפלה", "הגליל", "גוש דן", "מטרופולין תל אביב",
+  // English regional indicators
+  "central israel", "northern israel", "southern israel",
+  "sharon area", "gush dan",
+];
+
+// Scrapers we trust as inherently Israeli or worldwide-curated: skip the
+// keyword filter for them. Telegram channels we subscribe to are local
+// Israeli channels; LinkedIn search is constrained to Israel geo;
+// manual entries are user-curated.
+const TRUSTED_SOURCES = [
+  /^telegram:/,
+  /^linkedin$/,
+  /^manual$/,
 ];
 
 const WORLDWIDE_REMOTE_SIGNALS = [
@@ -53,8 +71,15 @@ const FOREIGN_ONLY_RED_FLAGS = [
 const lower = (s) => (s || "").toLowerCase();
 const has = (haystack, needles) => needles.some((n) => haystack.includes(n));
 
-const classify = ({ title, location, description }) => {
+const classify = ({ title, location, description, source }) => {
   const haystack = `${lower(title)} ${lower(location)} ${lower(description)}`;
+
+  // Trust the source. Israeli Telegram channels and Israel-only LinkedIn
+  // search are inherently location-filtered upstream.
+  if (source && TRUSTED_SOURCES.some((re) => re.test(source))) {
+    if (has(haystack, FOREIGN_ONLY_RED_FLAGS)) return "reject-foreign-only";
+    return "pass-trusted-source";
+  }
 
   if (has(haystack, FOREIGN_ONLY_RED_FLAGS)) return "reject-foreign-only";
   if (has(haystack, ISRAEL_KEYWORDS)) return "pass-israel";
