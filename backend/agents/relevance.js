@@ -10,15 +10,16 @@ ${CANDIDATE_PROFILE}
 
 === POSITIONING (CRITICAL) ===
 Adir is a Strong Junior / Early Mid engineer (~20 months hands-on, currently
-full-time Software Engineer at MSapps). He is NOT a generic graduate looking
-for a first job. His EDGE is specialization in Claude API integration, RAG,
-prompt engineering, and AI workflow automation. In those areas, 20 months of
-real production work in 2026 outweighs 5 years of generic Java/backend.
+full-time Software Engineer at MSapps). His EDGE is specialization in Claude
+API integration, RAG, prompt engineering, and AI workflow automation. In those
+areas, 20 months of real production work in 2026 outweighs 5 years of generic
+Java/backend.
 
-When scoring, treat "depth in RAG/AI" as worth MORE than year-count alone.
-Target sweet spot: jobs asking for 1-3 years. Penalize 5+ years. Also
-PENALIZE entry-level / bootcamp / "first opportunity" roles, because they
-undervalue his current trajectory and pay below his current MSapps level.
+VOLUME MODE: Adir wants high coverage. Apply to ANY role that involves writing
+code regularly, including student positions, QA automation, support engineering,
+DevOps with scripting, and roles with non-overlapping stacks if they are
+engineering. Only hard-reject true non-engineering work (pure sales, pure
+marketing, pure HR, pure product manager, office admin).
 
 === SCORING RUBRIC (0-100) ===
 Start at 50. Adjust:
@@ -30,6 +31,9 @@ Start at 50. Adjust:
   +15  iOS production work, Swift, mobile SDK, or large-scale app development
   +15  Requires 1-3 years experience (sweet spot, he has ~20 months)
   +10  Says "2+ years" or "3+ years" (apply anyway, depth in AI offsets month gap)
+  +10  Engineering role that requires writing code regularly (any language)
+   +8  QA Automation, SDET, or test engineering role (code-writing)
+   +5  Student / part-time engineering role (he is still completing his diploma)
   +15  Location is Herzliya OR Tel Aviv (Adir lives in Herzliya, this is his sweet spot)
   +12  Location is Gush Dan / Greater TA: Ramat Gan, Givatayim, Bnei Brak, Petah Tikva
    +8  Location is Sharon / central Israel: Netanya, Raanana, Kfar Saba, Hod Hasharon,
@@ -40,23 +44,20 @@ Start at 50. Adjust:
    +5  Mentions Figma-to-code, design-to-UI, marketing experiences, product collab
    +5  Hybrid arrangement (1-3 days office) in a preferred zone
 
-  -30  Requires 5+ years OR explicitly Senior/Staff/Principal/Lead (full-time)
-  -40  Role is NOT engineering (Sales, Marketing, QA, Support, HR, Product Mgmt,
-       Customer Success, DevRel-only, Data Analyst)
-  -40  "First opportunity", "recent graduate, no experience required", "bootcamp
-       grad welcome", paid trainee, or any framing that undervalues his current
-       role. These waste his time and pay below MSapps
-  -25  Stack has zero overlap (e.g. pure Python/Django, pure Java, pure C++,
-       pure Salesforce, pure SAP, Embedded/Firmware, Game dev with Unity/Unreal)
-  -20  On-site outside Israel, no remote option
+  -15  Requires 5+ years OR Senior/Staff/Principal/Lead (mismatch, but try anyway)
+  -40  Role is hard non-engineering: pure Sales, pure Marketing, pure HR,
+       pure Product Manager, pure Customer Success, pure office admin
+  -10  Stack has zero overlap with JS/TS/iOS (e.g. pure Salesforce, pure SAP,
+       Embedded/Firmware, Unity/Unreal game dev). Still apply if engineering.
+  -20  On-site outside Israel, no remote option (location filter usually catches)
   -15  Defense industry / requires security clearance Adir doesn't have
-  -15  Unpaid internship or student-only role
+  -10  Unpaid internship (paid student roles are OK)
 
 === HARD RULE ===
-If you cannot identify at least 2 concrete overlaps between the candidate's
-profile and the job requirements, the MAX score you may return is 55.
-Do NOT invent connections to inflate the score. It is better to miss a job
-than send a hallucinated cover letter.
+If you cannot identify at least 1 concrete overlap between the candidate's
+profile and the job requirements, the MAX score you may return is 40.
+Do NOT invent connections to inflate the score, but DO be permissive: any
+"writes code" engineering role counts as overlap with Adir's profile.
 
 === OUTPUT FORMAT ===
 {

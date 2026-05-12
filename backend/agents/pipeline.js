@@ -5,13 +5,17 @@ const manual = require("./scrapers/manual");
 const hn = require("./scrapers/hn");
 const telegramChannels = require("./scrapers/telegramChannels");
 const { extractDescription } = require("./extractText");
+const { extract: extractEmail } = require("./extractEmail");
 const relevance = require("./relevance");
 const locationFilter = require("./locationFilter");
+const composer = require("./composer");
+const sender = require("./sender");
 const telegram = require("./telegram");
 const { sleep } = require("./groqClient");
 
 const groqDelayMs = () => Number(process.env.GROQ_CALL_DELAY_MS || 2500);
 const threshold = () => Number(process.env.RELEVANCE_THRESHOLD || 70);
+const autoApproveThreshold = () => Number(process.env.AUTO_APPROVE_THRESHOLD || 0);
 
 const fetchFromAllSources = async () => {
   const settled = await Promise.allSettled([
@@ -102,13 +106,56 @@ const run = async () => {
 
         if (passed) {
           counts.relevant += 1;
+          // Try to extract a recruiter email from the description so we can
+          // potentially auto-send. Falls back to the existing contact_email if any.
+          const contactEmail = job.contact_email
+            || extractEmail(hydrated.description);
+          if (contactEmail && !job.contact_email) {
+            await db.setJobContactEmail(job.id, contactEmail);
+          }
+
+          const enrichedJob = {
+            ...job,
+            relevance_score: result.score,
+            relevance_reason: result.reason,
+            overlaps: result.overlaps,
+            contact_email: contactEmail,
+          };
+
+          const canAutoApprove =
+            autoApproveThreshold() > 0
+            && result.score >= autoApproveThreshold()
+            && contactEmail
+            && result.overlaps && result.overlaps.length >= 2;
+
+          if (canAutoApprove) {
+            try {
+              const composed = await composer.compose({ job: enrichedJob, overlaps: result.overlaps });
+              if (!composed.error) {
+                const sendResult = await sender.send({
+                  job: enrichedJob,
+                  sentTo: contactEmail,
+                  subject: composed.subject,
+                  body: composed.body,
+                });
+                if (sendResult.sent) {
+                  await telegram.sendPlain(
+                    `🤖 אוטומטי [${result.score}]: נשלח ל-${contactEmail}\n` +
+                    `${enrichedJob.title} @ ${enrichedJob.company}\n` +
+                    enrichedJob.url
+                  );
+                  await sleep(groqDelayMs());
+                  continue;
+                }
+                console.error("Auto-approve send failed:", sendResult.reason);
+              }
+            } catch (err) {
+              console.error("Auto-approve flow error:", err.message);
+            }
+          }
+
           try {
-            await telegram.sendJobApproval({
-              ...job,
-              relevance_score: result.score,
-              relevance_reason: result.reason,
-              overlaps: result.overlaps,
-            });
+            await telegram.sendJobApproval(enrichedJob);
           } catch (err) {
             console.error("Telegram send failed:", err.message);
           }

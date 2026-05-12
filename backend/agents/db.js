@@ -59,6 +59,10 @@ const updateJobRelevance = async (jobId, { score, reason, rejection_reason, over
 const setJobStatus = async (jobId, status) =>
   query(`UPDATE jobs SET status = $2 WHERE id = $1`, [jobId, status]);
 
+const setJobContactEmail = async (jobId, email) =>
+  query(`UPDATE jobs SET contact_email = $2 WHERE id = $1 AND contact_email IS NULL`,
+        [jobId, email]);
+
 const getJob = async (jobId) => {
   const { rows } = await query(
     `SELECT *, overlap_points AS overlaps FROM jobs WHERE id = $1`,
@@ -170,6 +174,7 @@ module.exports = {
   jobExistsByFingerprint,
   updateJobRelevance,
   setJobStatus,
+  setJobContactEmail,
   getJob,
   alreadySentToday,
   countSentToday,
