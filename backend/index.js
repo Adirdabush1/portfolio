@@ -173,6 +173,33 @@ app.post("/api/agent/telegram-webhook", async (req, res) => {
   }
 });
 
+// Resends all pending_approval jobs to Telegram. Used to recover from
+// past delivery failures or rendering issues. Token-guarded.
+app.post("/api/agent/resend-pending", async (req, res) => {
+  const token = req.get("X-Cron-Token");
+  if (!process.env.AGENT_CRON_TOKEN || token !== process.env.AGENT_CRON_TOKEN) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  try {
+    const { rows: jobs } = await db.query(
+      "SELECT *, overlap_points AS overlaps FROM jobs WHERE status='pending_approval' ORDER BY relevance_score DESC NULLS LAST LIMIT 20"
+    );
+    let sent = 0, failed = 0;
+    for (const j of jobs) {
+      try {
+        await telegram.sendJobApproval(j);
+        sent += 1;
+      } catch (err) {
+        console.error(`Resend job #${j.id} failed:`, err.message);
+        failed += 1;
+      }
+    }
+    res.json({ totalPending: jobs.length, sent, failed });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Diagnostic: returns latest pipeline run + pending counts. Token-guarded.
 app.get("/api/agent/status", async (req, res) => {
   const token = req.get("X-Cron-Token");
