@@ -173,6 +173,31 @@ app.post("/api/agent/telegram-webhook", async (req, res) => {
   }
 });
 
+// Diagnostic: returns latest pipeline run + pending counts. Token-guarded.
+app.get("/api/agent/status", async (req, res) => {
+  const token = req.get("X-Cron-Token");
+  if (!process.env.AGENT_CRON_TOKEN || token !== process.env.AGENT_CRON_TOKEN) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  try {
+    const { rows: runs } = await db.query(
+      "SELECT id, status, started_at, finished_at, jobs_fetched, jobs_new, jobs_relevant, LEFT(error, 200) AS error FROM pipeline_runs ORDER BY id DESC LIMIT 5"
+    );
+    const { rows: statusCounts } = await db.query(
+      "SELECT status, COUNT(*)::int AS c FROM jobs GROUP BY status"
+    );
+    const { rows: pending } = await db.query(
+      "SELECT id, source, relevance_score, LEFT(title, 80) AS title FROM jobs WHERE status='pending_approval' ORDER BY relevance_score DESC NULLS LAST LIMIT 15"
+    );
+    const { rows: sentToday } = await db.query(
+      "SELECT COUNT(*)::int AS c FROM applications WHERE status='sent' AND sent_at::date = CURRENT_DATE"
+    );
+    res.json({ runs, statusCounts, pending, sentToday: sentToday[0].c });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Manual job submission — used by frontend or curl. Telegram /add covers the bot path.
 const submitLimiter = rateLimit({ windowMs: 60000, max: 20, message: { error: "Too many requests" } });
 app.post("/api/agent/submit-job", submitLimiter, async (req, res) => {
