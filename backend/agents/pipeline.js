@@ -8,6 +8,7 @@ const { extractDescription } = require("./extractText");
 const { extract: extractEmail } = require("./extractEmail");
 const relevance = require("./relevance");
 const locationFilter = require("./locationFilter");
+const levelFilter = require("./levelFilter");
 const composer = require("./composer");
 const sender = require("./sender");
 const telegram = require("./telegram");
@@ -85,6 +86,20 @@ const run = async () => {
         if (!loc.startsWith("pass")) {
           await db.updateJobRelevance(job.id, {
             score: 0, reason: "", rejection_reason: `location:${loc}`,
+            overlaps: [], ai_metadata: null, status: "rejected",
+          });
+          continue;
+        }
+
+        // Hard level pre-filter: reject senior+ titles before AI scoring.
+        // Adir is an early-mid engineer, not a fit for senior/lead/principal.
+        const lvl = levelFilter.classify({
+          title: hydrated.title,
+          description: hydrated.description,
+        });
+        if (!lvl.startsWith("pass")) {
+          await db.updateJobRelevance(job.id, {
+            score: 0, reason: "", rejection_reason: `level:${lvl}`,
             overlaps: [], ai_metadata: null, status: "rejected",
           });
           continue;

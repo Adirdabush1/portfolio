@@ -173,6 +173,39 @@ app.post("/api/agent/telegram-webhook", async (req, res) => {
   }
 });
 
+// Re-applies the level filter to pending_approval jobs. Senior+ titles get
+// moved to rejected. Used to retroactively clean up after threshold changes.
+app.post("/api/agent/recheck-levels", async (req, res) => {
+  const token = req.get("X-Cron-Token");
+  if (!process.env.AGENT_CRON_TOKEN || token !== process.env.AGENT_CRON_TOKEN) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  try {
+    const levelFilter = require("./agents/levelFilter");
+    const { rows: jobs } = await db.query(
+      "SELECT id, title, description FROM jobs WHERE status='pending_approval'"
+    );
+    let rejected = 0, kept = 0;
+    const rejectedSamples = [];
+    for (const j of jobs) {
+      const verdict = levelFilter.classify({ title: j.title, description: j.description });
+      if (verdict.startsWith("pass")) {
+        kept += 1;
+      } else {
+        rejected += 1;
+        rejectedSamples.push({ id: j.id, title: (j.title || "").slice(0, 80), verdict });
+        await db.query(
+          "UPDATE jobs SET status='rejected', rejection_reason = COALESCE(rejection_reason, '') || ' ; level-recheck:' || $2 WHERE id=$1",
+          [j.id, verdict]
+        );
+      }
+    }
+    res.json({ total: jobs.length, kept, rejected, rejectedSamples });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Resends all pending_approval jobs to Telegram. Used to recover from
 // past delivery failures or rendering issues. Token-guarded.
 app.post("/api/agent/resend-pending", async (req, res) => {
