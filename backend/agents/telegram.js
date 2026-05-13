@@ -16,16 +16,18 @@ const getBot = () => {
 const chatId = () => process.env.TELEGRAM_CHAT_ID;
 
 const formatJobMessage = (job) => {
-  const overlaps = (job.overlaps || []).slice(0, 3).map((o, i) => `${i + 1}. ${o}`).join("\n");
+  const overlaps = (job.overlaps || []).slice(0, 4).map((o, i) => `${i + 1}. ${o}`).join("\n");
+  const reason = (job.relevance_reason || "").slice(0, 300).trim();
   return [
     `🎯 ${job.title || "(ללא כותרת)"}`,
     `🏢 ${job.company || "(ללא חברה)"}`,
     `📍 ${job.location || "(ללא מיקום)"}`,
     `⭐ התאמה: ${job.relevance_score}/100`,
+    `📡 מקור: ${job.source || "?"}`,
     "",
-    (job.relevance_reason || "").slice(0, 250),
+    `🔎 למה נבחר: ${reason || "(לא צוין)"}`,
     "",
-    "נקודות חיבור:",
+    "✅ נקודות חיבור:",
     overlaps || "(אין)",
     "",
     `🔗 ${job.url}`,

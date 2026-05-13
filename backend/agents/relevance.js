@@ -79,9 +79,9 @@ Do NOT invent connections to inflate the score, but DO be permissive: any
 === OUTPUT FORMAT ===
 {
   "score": <integer 0-100>,
-  "reason": "<1-2 sentence reason, REQUIRED if score >= 50, else empty string>",
+  "reason": "<MANDATORY 1-2 sentence reason explaining why this score was given, ALWAYS fill, never leave empty. State the strongest positive signal and the strongest negative signal in plain Hebrew or English.>",
   "rejection_reason": "<1-sentence why filtered, REQUIRED if score < 50, else empty string>",
-  "overlaps": ["<bullet 1>", "<bullet 2>", "..."]
+  "overlaps": ["<concrete overlap bullet, e.g. 'React mentioned in stack'>", "<bullet 2>", "..."]
 }
 `.trim();
 
