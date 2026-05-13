@@ -1,0 +1,23 @@
+name: Agent pipeline cron
+
+on:
+  schedule:
+    # Every 2 hours at minute 7 (offset to avoid GH cron contention on the hour)
+    - cron: "7 */2 * * *"
+  workflow_dispatch:
+
+jobs:
+  trigger-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: POST /api/agent/run
+        run: |
+          set -euo pipefail
+          response=$(curl -sS -o /tmp/body -w "%{http_code}" \
+            -X POST \
+            -H "X-Cron-Token: ${{ secrets.AGENT_CRON_TOKEN }}" \
+            "${{ secrets.AGENT_BASE_URL }}/api/agent/run")
+          echo "HTTP $response"
+          cat /tmp/body
+          test "$response" = "202"
