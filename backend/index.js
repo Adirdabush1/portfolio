@@ -233,6 +233,55 @@ app.post("/api/agent/resend-pending", async (req, res) => {
   }
 });
 
+// Diagnostic: groups recent jobs by rejection reason so we can see why
+// QA/DevOps/AI titles are being filtered out. Token-guarded.
+app.get("/api/agent/rejection-breakdown", async (req, res) => {
+  const token = req.get("X-Cron-Token");
+  if (!process.env.AGENT_CRON_TOKEN || token !== process.env.AGENT_CRON_TOKEN) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  try {
+    const { rows: byReason } = await db.query(`
+      SELECT
+        CASE
+          WHEN rejection_reason LIKE 'location:%' THEN 'location'
+          WHEN rejection_reason LIKE 'level:%'    THEN 'level (senior+)'
+          WHEN rejection_reason = 'empty-description' THEN 'empty-description'
+          WHEN rejection_reason ILIKE '%senior%' OR rejection_reason ILIKE '%lead%' THEN 'AI: senior/lead'
+          WHEN rejection_reason ILIKE '%stack%' OR rejection_reason ILIKE '%overlap%' THEN 'AI: stack mismatch'
+          WHEN rejection_reason ILIKE '%experience%' OR rejection_reason ILIKE '%years%' THEN 'AI: experience gap'
+          WHEN rejection_reason ILIKE '%manager%' OR rejection_reason ILIKE '%marketing%' OR rejection_reason ILIKE '%sales%' THEN 'AI: non-eng role'
+          ELSE 'AI: other'
+        END AS bucket,
+        COUNT(*)::int AS c
+      FROM jobs
+      WHERE status='rejected' AND scraped_at > NOW() - INTERVAL '24 hours'
+      GROUP BY bucket
+      ORDER BY c DESC
+    `);
+    const { rows: byKeyword } = await db.query(`
+      SELECT raw->>'search_keyword' AS keyword, COUNT(*)::int AS c
+      FROM jobs
+      WHERE source='linkedin' AND raw ? 'search_keyword'
+        AND scraped_at > NOW() - INTERVAL '24 hours'
+      GROUP BY raw->>'search_keyword'
+      ORDER BY c DESC
+    `);
+    const { rows: recentRejects } = await db.query(`
+      SELECT id, source, LEFT(title, 70) AS title, LEFT(rejection_reason, 120) AS rejection_reason, relevance_score
+      FROM jobs
+      WHERE status='rejected' AND scraped_at > NOW() - INTERVAL '24 hours'
+        AND (title ILIKE '%qa%' OR title ILIKE '%devops%' OR title ILIKE '%sre%'
+             OR title ILIKE '%ai%' OR title ILIKE '%ml%' OR title ILIKE '%machine learning%'
+             OR title ILIKE '%it%')
+      ORDER BY scraped_at DESC LIMIT 20
+    `);
+    res.json({ byReason, byKeyword, recentRejectsQAITAI: recentRejects });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Diagnostic: returns latest pipeline run + pending counts. Token-guarded.
 app.get("/api/agent/status", async (req, res) => {
   const token = req.get("X-Cron-Token");
