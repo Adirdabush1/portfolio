@@ -206,6 +206,121 @@ app.post("/api/agent/recheck-levels", async (req, res) => {
   }
 });
 
+// Revives jobs previously rejected as empty-description if their actual
+// description has at least N chars. They go back to status='new' so the
+// next pipeline run picks them up.
+app.post("/api/agent/revive-empty-desc", async (req, res) => {
+  const token = req.get("X-Cron-Token");
+  if (!process.env.AGENT_CRON_TOKEN || token !== process.env.AGENT_CRON_TOKEN) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  const minLen = Number(req.query.minLen || 40);
+  try {
+    const { rows } = await db.query(
+      `UPDATE jobs SET status='new', rejection_reason=NULL
+       WHERE status='rejected' AND rejection_reason='empty-description'
+         AND LENGTH(description) >= $1
+       RETURNING id, source, LEFT(title, 60) AS title, LENGTH(description) AS desc_len`,
+      [minLen]
+    );
+    res.json({ revived: rows.length, jobs: rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Re-scores jobs that are currently status='new' (revived ones or any other
+// not-yet-processed). Mirrors the pipeline scoring loop.
+app.post("/api/agent/rescore-new", async (req, res) => {
+  const token = req.get("X-Cron-Token");
+  if (!process.env.AGENT_CRON_TOKEN || token !== process.env.AGENT_CRON_TOKEN) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  res.json({ status: "accepted" });
+  // Run async so the HTTP call returns immediately.
+  (async () => {
+    try {
+      const relevance = require("./agents/relevance");
+      const locationFilter = require("./agents/locationFilter");
+      const levelFilter = require("./agents/levelFilter");
+      const telegram = require("./agents/telegram");
+      const { extract: extractEmail } = require("./agents/extractEmail");
+      const { sleep } = require("./agents/groqClient");
+      const threshold = Number(process.env.RELEVANCE_THRESHOLD || 50);
+      const delayMs = Number(process.env.GROQ_CALL_DELAY_MS || 2500);
+
+      const { rows: jobs } = await db.query(
+        "SELECT * FROM jobs WHERE status='new' ORDER BY id ASC LIMIT 100"
+      );
+      console.log(`Rescore: processing ${jobs.length} jobs`);
+
+      for (const job of jobs) {
+        try {
+          if (!job.description || job.description.length < 40) {
+            await db.updateJobRelevance(job.id, {
+              score: 0, reason: "", rejection_reason: "empty-description",
+              overlaps: [], ai_metadata: null, status: "rejected",
+            });
+            continue;
+          }
+          const loc = locationFilter.classify({
+            title: job.title, location: job.location,
+            description: job.description, source: job.source,
+          });
+          if (!loc.startsWith("pass")) {
+            await db.updateJobRelevance(job.id, {
+              score: 0, reason: "", rejection_reason: `location:${loc}`,
+              overlaps: [], ai_metadata: null, status: "rejected",
+            });
+            continue;
+          }
+          const lvl = levelFilter.classify({ title: job.title, description: job.description });
+          if (!lvl.startsWith("pass")) {
+            await db.updateJobRelevance(job.id, {
+              score: 0, reason: "", rejection_reason: `level:${lvl}`,
+              overlaps: [], ai_metadata: null, status: "rejected",
+            });
+            continue;
+          }
+          const result = await relevance.score({
+            title: job.title, company: job.company,
+            location: job.location, description: job.description,
+          });
+          const passed = result.score >= threshold;
+          await db.updateJobRelevance(job.id, {
+            score: result.score,
+            reason: result.reason,
+            rejection_reason: result.rejection_reason,
+            overlaps: result.overlaps,
+            ai_metadata: result.ai_metadata,
+            status: passed ? "pending_approval" : "rejected",
+          });
+          if (passed) {
+            const contactEmail = job.contact_email || extractEmail(job.description);
+            if (contactEmail && !job.contact_email) {
+              await db.setJobContactEmail(job.id, contactEmail);
+            }
+            const enriched = {
+              ...job,
+              relevance_score: result.score,
+              relevance_reason: result.reason,
+              overlaps: result.overlaps,
+              contact_email: contactEmail,
+            };
+            await telegram.sendJobApproval(enriched);
+          }
+          await sleep(delayMs);
+        } catch (err) {
+          console.error(`Rescore job #${job.id} failed:`, err.message);
+        }
+      }
+      console.log("Rescore done");
+    } catch (err) {
+      console.error("Rescore fatal:", err.message);
+    }
+  })();
+});
+
 // Resends all pending_approval jobs to Telegram. Used to recover from
 // past delivery failures or rendering issues. Token-guarded.
 app.post("/api/agent/resend-pending", async (req, res) => {

@@ -65,7 +65,10 @@ const run = async () => {
         counts.fresh += 1;
 
         const hydrated = await hydrateDescription(job);
-        if (!hydrated.description || hydrated.description.length < 100) {
+        // Lowered from 100 to 40 chars — Israeli Telegram job channels often
+        // post short Hebrew blurbs ("מגייסים מפתח/ת ג'וניור 📍 מרכז + link")
+        // that are still scorable when combined with the title.
+        if (!hydrated.description || hydrated.description.length < 40) {
           await db.updateJobRelevance(job.id, {
             score: 0, reason: "", rejection_reason: "empty-description",
             overlaps: [], ai_metadata: null, status: "rejected",
