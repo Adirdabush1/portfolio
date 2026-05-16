@@ -206,6 +206,42 @@ app.post("/api/agent/recheck-levels", async (req, res) => {
   }
 });
 
+// Looks up jobs by company name or title fragment. Returns status + any
+// application records, so we can answer "did we apply to X?" quickly.
+app.get("/api/agent/find", async (req, res) => {
+  const token = req.get("X-Cron-Token");
+  if (!process.env.AGENT_CRON_TOKEN || token !== process.env.AGENT_CRON_TOKEN) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  const q = (req.query.q || "").trim();
+  if (!q) return res.status(400).json({ error: "Missing q query param" });
+  try {
+    const { rows: jobs } = await db.query(
+      `SELECT id, source, status, relevance_score, contact_email,
+              LEFT(title, 120) AS title, LEFT(company, 80) AS company,
+              location, url, scraped_at,
+              LEFT(rejection_reason, 200) AS rejection_reason
+       FROM jobs
+       WHERE company ILIKE $1 OR title ILIKE $1 OR description ILIKE $1
+       ORDER BY scraped_at DESC LIMIT 30`,
+      [`%${q}%`]
+    );
+    const ids = jobs.map((j) => j.id);
+    let applications = [];
+    if (ids.length) {
+      const apps = await db.query(
+        `SELECT job_id, status, sent_to, sent_at, subject
+         FROM applications WHERE job_id = ANY($1::int[]) ORDER BY sent_at DESC`,
+        [ids]
+      );
+      applications = apps.rows;
+    }
+    res.json({ query: q, matches: jobs.length, jobs, applications });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Runs deep email search on every pending_approval job that has no
 // contact_email yet. Useful to retroactively unlock auto-submission on
 // jobs that were waiting for manual review only because we missed the email.
