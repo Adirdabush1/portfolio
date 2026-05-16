@@ -6,6 +6,7 @@ const hn = require("./scrapers/hn");
 const telegramChannels = require("./scrapers/telegramChannels");
 const { extractDescription } = require("./extractText");
 const { extract: extractEmail } = require("./extractEmail");
+const deepEmailSearch = require("./deepEmailSearch");
 const relevance = require("./relevance");
 const locationFilter = require("./locationFilter");
 const levelFilter = require("./levelFilter");
@@ -127,10 +128,17 @@ const run = async () => {
 
         if (passed) {
           counts.relevant += 1;
-          // Try to extract a recruiter email from the description so we can
-          // potentially auto-send. Falls back to the existing contact_email if any.
-          const contactEmail = job.contact_email
-            || extractEmail(hydrated.description);
+          // Look for a recruiter email: description text first (cheap), then
+          // follow the URLs in the post to grab mailto:/inline addresses on
+          // the linked careers/Greenhouse/Lever page (one network hop each).
+          let contactEmail = job.contact_email || extractEmail(hydrated.description);
+          if (!contactEmail) {
+            const deep = await deepEmailSearch.find({
+              url: hydrated.url,
+              description: hydrated.description,
+            });
+            if (deep.email) contactEmail = deep.email;
+          }
           if (contactEmail && !job.contact_email) {
             await db.setJobContactEmail(job.id, contactEmail);
           }

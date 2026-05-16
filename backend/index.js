@@ -206,6 +206,42 @@ app.post("/api/agent/recheck-levels", async (req, res) => {
   }
 });
 
+// Runs deep email search on every pending_approval job that has no
+// contact_email yet. Useful to retroactively unlock auto-submission on
+// jobs that were waiting for manual review only because we missed the email.
+app.post("/api/agent/deep-email-search", async (req, res) => {
+  const token = req.get("X-Cron-Token");
+  if (!process.env.AGENT_CRON_TOKEN || token !== process.env.AGENT_CRON_TOKEN) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  res.json({ status: "accepted" });
+  (async () => {
+    try {
+      const deepEmailSearch = require("./agents/deepEmailSearch");
+      const { rows: jobs } = await db.query(
+        "SELECT id, url, description FROM jobs WHERE status='pending_approval' AND (contact_email IS NULL OR contact_email='')"
+      );
+      console.log(`Deep email search: ${jobs.length} jobs`);
+      let found = 0;
+      for (const j of jobs) {
+        try {
+          const r = await deepEmailSearch.find({ url: j.url, description: j.description });
+          if (r.email) {
+            await db.setJobContactEmail(j.id, r.email);
+            found += 1;
+            console.log(`  #${j.id} found ${r.email} via ${r.source}`);
+          }
+        } catch (err) {
+          console.error(`  #${j.id} deep search failed:`, err.message);
+        }
+      }
+      console.log(`Deep email search done. Found emails for ${found}/${jobs.length}`);
+    } catch (err) {
+      console.error("Deep email search fatal:", err.message);
+    }
+  })();
+});
+
 // Revives jobs previously rejected as empty-description if their actual
 // description has at least N chars. They go back to status='new' so the
 // next pipeline run picks them up.
